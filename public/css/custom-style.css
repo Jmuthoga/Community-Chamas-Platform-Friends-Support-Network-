@@ -1,0 +1,189 @@
+/* ========= FSN THEME ========== */
+
+/* ===== Primary Brand Colors ===== */
+:root {
+    --fsn-blue: #123A63;
+    --fsn-blue-light: #1C4F7A;
+    --fsn-green: #2E7D32;
+    --fsn-green-light: #4CAF50;
+}
+
+/* ===== Sidebar Background ===== */
+.sidebar-light-lightblue,
+.main-sidebar {
+    background-color: var(--fsn-blue) !important;
+    box-shadow: none !important;
+}
+
+/* ===== Sidebar Text ===== */
+.main-sidebar .nav-link {
+    color: #ffffff !important;
+}
+
+/* Sidebar Icons */
+.main-sidebar .nav-icon {
+    color: #ffffff !important;
+}
+
+/* Sidebar Brand Text */
+.brand-text {
+    color: #ffffff !important;
+}
+
+/* Sidebar Hover */
+.main-sidebar .nav-link:hover {
+    background-color: var(--fsn-blue-light) !important;
+    color: #ffffff !important;
+}
+
+/* Sidebar Active Menu */
+.nav-sidebar .nav-link.active {
+    background-color: var(--fsn-green) !important;
+    color: #ffffff !important;
+}
+
+/* Treeview (Dropdown Sidebar Items) */
+.nav-treeview .nav-link {
+    color: #ffffff !important;
+}
+
+.nav-treeview .nav-link:hover {
+    background-color: var(--fsn-blue-light) !important;
+}
+
+/* ===== Navbar ===== */
+.main-header.navbar {
+    background-color: var(--fsn-blue) !important;
+    border: none !important;
+}
+
+.main-header .nav-link,
+.main-header .navbar-nav .nav-link {
+    color: #ffffff !important;
+}
+
+/* ===== Text Color ===== */
+.text-lightblue {
+    color: var(--fsn-blue) !important;
+}
+
+/* ===== Links ===== */
+a {
+    color: var(--fsn-blue);
+}
+
+/* ===== Gradient Primary ===== */
+.bg-gradient-primary {
+    background: var(--fsn-blue) linear-gradient(180deg, #123A63, #1C4F7A) repeat-x !important;
+}
+
+.bg-gradient-primary.btn:hover {
+    background: #0D2A48 linear-gradient(180deg, #1C4F7A, #0D2A48) repeat-x !important;
+    border-color: #0D2A48 !important;
+}
+
+/* ===== Primary Background ===== */
+.bg-primary {
+    background: var(--fsn-blue) !important;
+}
+
+/* ===== Buttons ===== */
+.btn-lightblue {
+    color: #ffffff !important;
+    background-color: var(--fsn-blue) !important;
+    border-color: var(--fsn-blue) !important;
+}
+
+.btn-lightblue:hover {
+    background: var(--fsn-blue-light) !important;
+    border-color: var(--fsn-blue-light) !important;
+}
+
+/* ===== Page Background ===== */
+body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .content-wrapper,
+body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .main-footer {
+    background-color: #f4f7fb !important;
+}
+
+/* ===== Brand Logo Area ===== */
+.elevation-3 {
+    background: var(--fsn-blue) !important;
+}
+
+/* ===== Preloader ===== */
+.preloader {
+    background-color: #f4f7fb !important;
+}
+
+/* ========= FSN THEME END ========== */
+
+
+/* ===== Existing Layout Fixes ===== */
+
+.site-logo-placeholder {
+    width: auto;
+    max-width: 260px;
+    max-height: 80px;
+}
+
+/* ===== Select2 Fix ===== */
+.select2-container--default .select2-selection--single {
+    height: calc(1.5em + 0.75rem + 2px) !important;
+}
+
+/* ===== Switch Toggle ===== */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: var(--fsn-green);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--fsn-green);
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+.slider.round {
+    border-radius: 20px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+

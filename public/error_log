@@ -1,0 +1,2 @@
+[05-Aug-2025 18:56:06 Africa/Nairobi] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in /home/pvxkzubm/public_html/pos/app/Http/Controllers/MpesaController.php on line 3
+[05-Aug-2025 18:57:10 Africa/Nairobi] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in /home/pvxkzubm/public_html/pos/app/Http/Controllers/MpesaController.php on line 3
