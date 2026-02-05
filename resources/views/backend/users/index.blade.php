@@ -23,6 +23,7 @@
                                 <th data-orderable="false">#</th>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Phone</th>
                                 <th>Role</th>
                                 <th>Created</th>
                                 <th>Status</th>
@@ -55,6 +56,7 @@
                 { data: 'thumb', name: 'thumb' },
                 { data: 'name', name: 'name' },
                 { data: 'email', name: 'email' },
+                { data: 'phone', name: 'phone' },
                 { data: 'roles', name: 'roles' },
                 { data: 'created', name: 'created' },
                 { data: 'suspend', name: 'status' },

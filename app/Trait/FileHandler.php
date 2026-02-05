@@ -64,13 +64,14 @@ class FileHandler
         }
     }
 
-    public function fileUploadAndGetPath($file, $path = "/public/media/others")
+    public function fileUploadAndGetPath($file, $folder = "media/others")
     {
-        $file_name = time() . "_" . $file->getClientOriginalName();
+        $file_name = time() . "_" . uniqid() . "_" . $file->getClientOriginalName();
 
-        $file->storeAs($path, $file_name);
+        // Store in storage/app/public/<folder>
+        $file_path = $file->storeAs($folder, $file_name, 'public');
 
-        // Remove Public from link
-        return substr($path . "/" . $file_name, 8);
+        // Return the relative path (for asset('storage/...'))
+        return $file_path; // returns e.g., 'media/others/12345_filename.jpg'
     }
 }

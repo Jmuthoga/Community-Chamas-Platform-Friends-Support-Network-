@@ -6,7 +6,11 @@ $route = request()->route()->getName();
 
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-            <img src="{{ auth()->user()->pro_pic }}" class="img-circle elevation-2" style="width: 2.5rem; height: 2.5rem;"
+            <img src="{{ auth()->user()->profile_image 
+                    ? asset('storage/' . auth()->user()->profile_image) 
+                    : asset('assets/images/no-image.png') }}"
+                class="img-circle elevation-2"
+                style="width: 2.5rem; height: 2.5rem;"
                 alt="User Image">
         </div>
         <div class="info">

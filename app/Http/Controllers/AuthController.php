@@ -75,27 +75,34 @@ class AuthController extends Controller
             $request->validate([
                 'name' => 'required',
                 'email' => 'email|required|unique:users',
+                'phone' => [
+                    'required',
+                    'unique:users',
+                    'regex:/^(07|01|2547|2541)[0-9]{8}$/'
+                ],
                 'password' => 'required|confirmed|min:6'
             ]);
 
             $newUser = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
+                'phone' => $this->formatPhone($request->phone), // ✅ formatted here
                 'password' => bcrypt($request->password),
                 'username' => uniqid(),
             ]);
-            
+                        
             if ($newUser) {
                 $request->session()->regenerate();
                 Auth::login($newUser);
                 return redirect()->route('backend.admin.dashboard')->with('success', 'User registered successfully');
-             } else {
+            } else {
                 return back()->with('error', 'Something went wrong');
             }
         } else {
             return view('frontend.authentication.sign-up');
         }
     }
+
 
     public function forgetPassword(Request $request)
     {
@@ -240,10 +247,15 @@ class AuthController extends Controller
     public function update(Request $request)
     {
         $user = User::find(auth()->id());
-        // dd($request->all());
+
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => [
+                'required',
+                'unique:users,phone,' . $user->id,
+                'regex:/^(07|01|2547|2541)[0-9]{8}$/'
+            ],
             'profile_image' => ['file', new ValidImageType]
         ]);
 
@@ -254,6 +266,11 @@ class AuthController extends Controller
         if ($request->email !== $user->email) {
             $user->email = $request->email;
             $user->google_id = null;
+        }
+
+        // ✅ Only addition — format phone before saving
+        if ($this->formatPhone($request->phone) !== $user->phone) {
+            $user->phone = $this->formatPhone($request->phone);
         }
 
         if ($request->hasFile("profile_image")) {
@@ -298,4 +315,15 @@ class AuthController extends Controller
             return redirect()->route('login')->with('error', 'You are not logged in');
         }
     }
+
+    private function formatPhone($phone)
+    {
+        $phone = preg_replace('/\D/', '', $phone);
+
+        if (str_starts_with($phone, '0')) {
+            return '254' . substr($phone, 1);
+        }
+
+        return $phone;
+    }   
 }

@@ -159,6 +159,23 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- phone -->
+                        <div class="col-sm-6 col-lg-12 col-xl-6">
+                            <div class="form-group">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel"
+                                    class="form-control"
+                                    id="phone"
+                                    placeholder="Enter phone (07XXXXXXXX or 2547XXXXXXXX)"
+                                    autocomplete="off"
+                                    name="phone"
+                                    value="{{ old('phone') }}"
+                                    required>
+                                <div class="invalid-feedback">
+                                    Please enter a valid phone number.
+                                </div>
+                            </div>
+                        </div>
                         <!-- password -->
                         <div class="col-sm-6 col-lg-12 col-xl-6">
                             <div class="form-group">

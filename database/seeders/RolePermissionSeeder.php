@@ -17,8 +17,9 @@ class RolePermissionSeeder extends Seeder
     {
         $roles = [
             'Admin',
-            'production_manager',
-            'sales_associate',
+            'Accountant',
+            'Chairperson',
+            'Member',
         ];
         for ($i = 0; $i < count($roles); $i++) {
             $result = Role::firstOrCreate(['name' => $roles[$i]]);
@@ -34,6 +35,7 @@ class RolePermissionSeeder extends Seeder
             'role_update',
             'role_delete',
             'permission_view',
+
             //user
             'user_create',
             'user_view',
@@ -59,43 +61,77 @@ class RolePermissionSeeder extends Seeder
         }
 
         // Create users and assign roles
-        $cashierUser = User::create([
-            'name' => 'production Manager',
-            'email' => 'manager@jminnovatechsolution.co.ke',
-            'password' => bcrypt(12345678),
+        $AdminUser = User::create([
+            'name' => 'Admin',
+            'email' => 'johnmuthogakanyingi@gmail.com',
+            'phone' => '254700000001',
+            'password' => bcrypt('12345678'),
+            'username' => uniqid(), 
+        ]);
+
+        $AccountantUser = User::create([
+            'name' => 'Accountant',
+            'email' => 'accountant@jminnovatechsolution.co.ke',
+            'phone' => '254700000002',
+            'password' => bcrypt('12345678'),
             'username' => uniqid(),
         ]);
-        $salesUser = User::create([
-            'name' => 'Mr Sales',
-            'email' => 'sales@jminnovatechsolution.co.ke',
-            'password' => bcrypt(12345678),
+
+        $ChairpersonUser = User::create([
+            'name' => 'Chairperson',
+            'email' => 'chairperson@jminnovatechsolution.co.ke',
+            'phone' => '254700000003',
+            'password' => bcrypt('12345678'),
             'username' => uniqid(),
         ]);
+
+        $MemberUser = User::create([
+            'name' => 'Member',
+            'email' => 'member@example.com',
+            'phone' => '254700000004',
+            'password' => bcrypt('12345678'),
+            'username' => uniqid(),
+        ]);
+
+
         // Assign roles to users
-        $production_managerRole = Role::where('name', 'production_manager')->first();
-        $salesRole = Role::where('name', 'sales_associate')->first();
+        $AdminRole = Role::where('name', 'Admin')->first();
+        $AccountantRole = Role::where('name', 'Accountant')->first();
+        $ChairpersonRole = Role::where('name', 'Chairperson')->first();
+        $MemberRole = Role::where('name', 'Member')->first();
 
-        $cashierUser->assignRole($production_managerRole);
-        $salesUser->assignRole($salesRole);
+        $AdminUser->assignRole($AdminRole);
+        $AccountantUser->assignRole($AccountantRole);
+        $ChairpersonUser->assignRole($ChairpersonRole);
+        $MemberUser->assignRole($MemberRole);
 
-        // Optionally, assign permissions to the cashier and sales_associate roles
+        // Optionally, assign permissions to the Accountant and Chairperson roles
         // You can customize these permissions as needed
-        $production_managerPermissions = [
+        $AccountantPermissions = [
 
         ];
 
-        $salesPermissions = [
+        $ChairpersonPermissions = [
 
         ];
 
-        foreach ($production_managerPermissions as $permissionName) {
+        $MemberPermissions = [
+            
+        ];
+
+        foreach ($MemberPermissions as $permissionName) {
             $permission = Permission::firstOrCreate(['name' => $permissionName]);
-            $production_managerRole->givePermissionTo($permission);
+            $MemberRole->givePermissionTo($permission);
         }
 
-        foreach ($salesPermissions as $permissionName) {
+        foreach ($AccountantPermissions as $permissionName) {
             $permission = Permission::firstOrCreate(['name' => $permissionName]);
-            $salesRole->givePermissionTo($permission);
+            $AccountantRole->givePermissionTo($permission);
+        }
+
+        foreach ($ChairpersonPermissions as $permissionName) {
+            $permission = Permission::firstOrCreate(['name' => $permissionName]);
+            $ChairpersonRole->givePermissionTo($permission);
         }
     }
 }

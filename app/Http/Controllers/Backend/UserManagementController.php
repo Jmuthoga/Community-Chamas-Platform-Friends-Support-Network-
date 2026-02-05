@@ -21,8 +21,8 @@ class UserManagementController extends Controller
 
     public function index(Request $request)
     {
-
         abort_if(!auth()->user()->can('user_view'), 403);
+
         if ($request->ajax()) {
             $users = User::with('roles')->latest()->get();
 
@@ -32,39 +32,43 @@ class UserManagementController extends Controller
                     'thumb',
                     '<img class="img-fluid" src="{{ $pro_pic }}" width="50" alt="{{ $name }}">'
                 )
+                // <-- Add phone column here
+                ->addColumn('phone', function ($data) {
+                    return $data->phone; // displays the phone number
+                })
                 ->addColumn('created', function ($data) {
                     return date('d M, Y', strtotime($data->created_at));
                 })
                 ->addColumn(
                     'action',
                     '<div class="action-wrapper">
-                    <a class="btn btn-sm bg-gradient-primary"
-                        href="{{ route(\'backend.admin.user.edit\', $id) }}">
-                        <i class="fas fa-edit"></i>
-                        Edit
+                <a class="btn btn-sm bg-gradient-primary"
+                    href="{{ route(\'backend.admin.user.edit\', $id) }}">
+                    <i class="fas fa-edit"></i>
+                    Edit
+                </a>
+                <a class="btn btn-sm bg-gradient-danger"
+                    href="{{ route(\'backend.admin.user.delete\', $id) }}"
+                    onclick="return confirm(\'Are you sure ?\')">
+                    <i class="fas fa-trash-alt"></i>
+                    Delete
+                </a>
+                @if ($is_suspended)
+                    <a class="btn btn-sm bg-gradient-success"
+                        href="{{ route(\'backend.admin.user.suspend\', [\'id\' => $id, \'status\' => 0]) }}">
+                        <i class="fas fa-check-square"></i>
+                        Activate
                     </a>
-                    <a class="btn btn-sm bg-gradient-danger"
-                        href="{{ route(\'backend.admin.user.delete\', $id) }}"
+                @else
+                    <a class="btn btn-sm bg-gradient-warning"
+                        href="{{ route(\'backend.admin.user.suspend\', [\'id\' => $id, \'status\' => 1]) }}"
                         onclick="return confirm(\'Are you sure ?\')">
-                        <i class="fas fa-trash-alt"></i>
-                        Delete
+                        <i class="far fa-times-circle"></i>
+                        Suspend
                     </a>
-                    @if ($is_suspended)
-                        <a class="btn btn-sm bg-gradient-success"
-                            href="{{ route(\'backend.admin.user.suspend\', [\'id\' => $id, \'status\' => 0]) }}">
-                            <i class="fas fa-check-square"></i>
-                            Activate
-                        </a>
-                    @else
-                        <a class="btn btn-sm bg-gradient-warning"
-                            href="{{ route(\'backend.admin.user.suspend\', [\'id\' => $id, \'status\' => 1]) }}"
-                            onclick="return confirm(\'Are you sure ?\')">
-                            <i class="far fa-times-circle"></i>
-                            Suspend
-                        </a>
-                    @endif
-                    
-                </div>'
+                @endif
+                
+            </div>'
                 )
                 ->addColumn('suspend', function ($data) {
                     if ($data->is_suspended == 0) {
@@ -81,6 +85,7 @@ class UserManagementController extends Controller
                         }
                     }
                 })
+                // Add 'phone' here if you ever want HTML formatting
                 ->rawColumns(['thumb', 'created', 'action', 'suspend', 'roles'])
                 ->toJson();
         }
@@ -115,11 +120,13 @@ class UserManagementController extends Controller
     public function create(Request $request)
     {
         abort_if(!auth()->user()->can(
-        'user_create'), 403);
+            'user_create'
+        ), 403);
         if ($request->isMethod('post')) {
             $request->validate([
                 'name' => 'required',
                 'email' => 'required|email|unique:users,email',
+                'phone' => ['required', 'unique:users', 'regex:/^(07|01|2547|2541)[0-9]{8}$/'],
                 'role' => 'required',
                 'password' => 'required',
                 'profile_image' => ['file', new ValidImageType]
@@ -128,11 +135,12 @@ class UserManagementController extends Controller
             $newUser = new User();
             $newUser->name = $request->name;
             $newUser->email = $request->email;
+            $newUser->phone = $this->formatPhone($request->phone);
             $newUser->password = bcrypt($request->password);
             $newUser->username = uniqid();
 
             if ($request->hasFile("profile_image")) {
-                $newUser->profile_image = $this->fileHandler->fileUploadAndGetPath($request->file("profile_image"), "/public/media/users");
+                $newUser->profile_image = $this->fileHandler->fileUploadAndGetPath($request->file("profile_image"), "media/users");
             }
             $newUser->save();
 
@@ -156,6 +164,7 @@ class UserManagementController extends Controller
             $request->validate([
                 'name' => 'required',
                 'email' => 'required|email|unique:users,email,' . $id,
+                'phone' => ['required', 'unique:users,phone,' . $id, 'regex:/^(07|01|2547|2541)[0-9]{8}$/'],
                 'role' => 'required',
                 'password' => 'required',
                 'profile_image' => ['file', new ValidImageType]
@@ -171,20 +180,26 @@ class UserManagementController extends Controller
                 $user->is_google_registered = false;
             }
 
+            if ($this->formatPhone($request->phone) !== $user->phone) {
+                $user->phone = $this->formatPhone($request->phone);
+            }
+
             if ($request->password) {
                 $user->password = bcrypt($request->password);
             }
 
             if ($request->hasFile("profile_image")) {
-                $this->fileHandler->secureUnlink($user->profile_image);
-
-                $user->profile_image = $this->fileHandler->fileUploadAndGetPath($request->file("profile_image"), "/public/media/users");
+                if (isset($user)) {
+                    // delete old image when editing
+                    $this->fileHandler->secureUnlink($user->profile_image);
+                }
+                $user->profile_image = $this->fileHandler->fileUploadAndGetPath($request->file("profile_image"), "media/users");
             }
             $user->save();
 
             $role = Role::find($request->role);
             $user->syncRoles($role);
-            
+
             return to_route('backend.admin.users')->with('success', 'User updated successfully');
         } else {
             if ($id == auth()->id()) {
@@ -211,5 +226,16 @@ class UserManagementController extends Controller
         $user->delete();
 
         return back()->with('success', 'User deleted successfully');
+    }
+
+    private function formatPhone($phone)
+    {
+        $phone = preg_replace('/\D/', '', $phone);
+
+        if (str_starts_with($phone, '0')) {
+            return '254' . substr($phone, 1);
+        }
+
+        return $phone;
     }
 }

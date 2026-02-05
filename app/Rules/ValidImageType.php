@@ -9,10 +9,11 @@ class ValidImageType implements Rule
 {
     public function passes($attribute, $value)
     {
-        $allowedTypes = ['jpeg', 'png', 'gif', 'bmp', 'webp'];
-        $extension = strtolower(pathinfo($value->getClientOriginalName(), PATHINFO_EXTENSION));
+        if (!$value->isValid()) return false; // Ensure file is uploaded properly
 
-        return in_array($extension, $allowedTypes);
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'];
+
+        return in_array($value->getMimeType(), $allowedMimes);
     }
 
     public function message()

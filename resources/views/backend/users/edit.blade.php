@@ -25,6 +25,14 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="form-group">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone"
+                                placeholder="Enter phone (07XXXXXXXX or 2547XXXXXXXX)" name="phone"
+                                value="{{ $user->phone }}" required>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
                             <label for="confirmPassword" class="form-label">Role & Permissions</label>
                             <select class="custom-select" name="role" required>
                                 <option value="">-- Select a role ---</option>
