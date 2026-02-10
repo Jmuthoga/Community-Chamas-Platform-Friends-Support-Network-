@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
@@ -8,7 +9,9 @@ use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Backend\RolePermission\PermissionController;
 use App\Http\Controllers\Backend\RolePermission\RoleController;
 use App\Http\Controllers\Backend\UserManagementController;
+use App\Http\Controllers\Backend\CurrencyController;
 use App\Http\Controllers\Backend\WebsiteSettingController;
+use App\Http\Controllers\Backend\Member\ContributionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +44,22 @@ Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallba
 Route::prefix('admin')->as('backend.admin.')->middleware(['admin'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    
+    // ====================== CONTRIBUTIONS ======================
+    Route::prefix('contributions')->group(function () {
+        // MEMBER / ADMIN - List all contributions
+        Route::get('/', [ContributionController::class, 'index'])->name('contributions.index');
+        // MEMBER / ADMIN - Current month contributions (optional user)
+        Route::get('current/{user?}', [ContributionController::class, 'showCurrent'])->name('contributions.current');
+        Route::get('member/{user}', [ContributionController::class, 'showMemberContributions'])->name('contributions.member.view');
+        // ADMIN - Contribution Settings
+        Route::get('settings', [ContributionController::class, 'settings'])->name('contributions.settings'); // Admin only
+        Route::post('settings', [ContributionController::class, 'updateSettings'])->name('contributions.settings.update'); // Admin only
+    });
+
+    // Currencies
+    Route::resource('currencies', CurrencyController::class);
+    Route::get('currencies/default/{id}', [CurrencyController::class, 'setDefault'])->name('currencies.setDefault');
+
     // Profile
     Route::get('profile', [DashboardController::class, 'profile'])->name('profile');
     Route::post('profile/update', [AuthController::class, 'update'])->name('profile.update');

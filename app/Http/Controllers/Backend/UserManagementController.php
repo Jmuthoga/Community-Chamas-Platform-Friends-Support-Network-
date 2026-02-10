@@ -28,10 +28,19 @@ class UserManagementController extends Controller
 
             return DataTables::of($users)
                 ->addIndexColumn()
-                ->addColumn(
-                    'thumb',
-                    '<img class="img-fluid" src="{{ $pro_pic }}" width="50" alt="{{ $name }}">'
-                )
+                ->addColumn('thumb', function ($user) {
+
+                    $image = $user->profile_image
+                        ? asset('storage/' . $user->profile_image)
+                        : asset('assets/images/no-image.png');
+                        return '<img src="' . $image . '"
+                    class="rounded-circle shadow-sm"
+                    width="50"
+                    height="50"
+                    style="object-fit: cover; object-position: center;"
+                    alt="' . $user->name . '">';
+                    })
+
                 // <-- Add phone column here
                 ->addColumn('phone', function ($data) {
                     return $data->phone; // displays the phone number

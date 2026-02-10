@@ -5,7 +5,7 @@
 @section('content')
 <div class="card">
 
-  @can('currency_create')
+  @can('currency-create')
   <div class="mt-n5 mb-3 d-flex justify-content-end">
     <a href="{{ route('backend.admin.currencies.create') }}" class="btn bg-gradient-primary">
       <i class="fas fa-plus-circle"></i>

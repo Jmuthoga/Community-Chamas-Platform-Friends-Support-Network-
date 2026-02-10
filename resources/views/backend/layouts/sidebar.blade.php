@@ -34,8 +34,62 @@ $route = request()->route()->getName();
                 </a>
             </li>
             @endcan
+
+            {{-- ======================== CONTRIBUTIONS ======================== --}}
+            @php
+                $route = request()->route()->getName();
+                $userId = auth()->id(); // current logged-in user
+            @endphp
+
+            @if (auth()->user()->hasAnyPermission([
+                'view-contribution-view',
+                'view-contribution-current'
+            ]))
+            <li class="nav-header text-white">CONTRIBUTIONS</li>
+
+            <li class="nav-item">
+                <a href="#" class="nav-link d-flex justify-content-between align-items-center">
+                    <span>
+                        <i class="fas fa-hand-holding-usd nav-icon"></i>
+                        Monthly Contributions
+                    </span>
+                    <span class="d-flex justify-content-between align-items-center">
+                        <i class="fas fa-angle-left right"></i>
+                    </span>
+                </a>
+
+                <ul class="nav nav-treeview">
+                    @can('view-contribution-view')
+                    <li class="nav-item">
+                        <a href="{{ route('backend.admin.contributions.index') }}"
+                        class="nav-link {{ $route === 'backend.admin.contributions.index' ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>All Contributions</p>
+                        </a>
+                    </li>
+                    @endcan
+
+                    @can('view-contribution-current')
+                    <li class="nav-item">
+                        <a href="{{ route('backend.admin.contributions.current', ['user' => $userId]) }}"
+                        class="nav-link {{ $route === 'backend.admin.contributions.current' ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Current Month</p>
+                        </a>
+                    </li>
+                    @endcan
+                </ul>
+            </li>
+            @endif
+
             {{-- settings --}}
             @if (auth()->user()->hasAnyPermission([
+            //currency
+            'currency-create',
+            'currency-view',
+            'currency-update',
+            'currency-delete',
+            'currency-set-default',
             //role
             'role_create',
             'role_view',
@@ -84,6 +138,15 @@ $route = request()->route()->getName();
                             class="nav-link {{ $route === 'backend.admin.settings.website.general' ? 'active' : '' }}">
                             <i class="fas fa-circle nav-icon"></i>
                             <p>General Settings</p>
+                        </a>
+                    </li>
+                    @endif
+                    @if (auth()->user()->hasAnyPermission(['currency-create','currency-view','currency-update','currency-delete']))
+                    <li class="nav-item">
+                        <a href="{{ route('backend.admin.currencies.index') }}"
+                            class="nav-link {{ request()->routeIs([ 'backend.admin.currencies.index', 'backend.admin.currencies.create', 'backend.admin.currencies.edit']) ? 'active' : '' }}">
+                            <i class="fas fa-coins nav-icon"></i>
+                            <p>Currency</p>
                         </a>
                     </li>
                     @endif
