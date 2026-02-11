@@ -12,15 +12,16 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Example of default Laravel command
-        // $schedule->command('inspire')->hourly();
-
-        // Your custom scheduled tasks
+        // Daily scheduled task for contributions and penalties
         $schedule->call(function () {
             $service = app(\App\Services\ContributionService::class);
+            // Generate monthly contributions for all users
             $service->generateMonthlyContributions();
+            // Apply penalties automatically
             $service->applyPenalties();
-        })->daily();
+        })->daily()
+          ->withoutOverlapping()  // prevent multiple runs if one is still executing
+          ->runInBackground();    // run asynchronously
     }
 
     /**
@@ -28,9 +29,8 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }
-
 }

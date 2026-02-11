@@ -45,21 +45,44 @@ class ContributionController extends Controller
                         : '<span class="badge badge-danger">Unpaid</span>';
                 })
                 ->addColumn('action', function ($row) {
-                    $buttons = '<div class="btn-group" role="group">';
 
-                    // View button
+                    $buttons = '<div class="action-wrapper">';
+
+                    // View Contribution
                     if (auth()->user()->can('view-contribution-current')) {
-                        $buttons .= '<a href="' . route("backend.admin.contributions.member.view", ['user' => $row->user_id]) . '" class="btn btn-sm btn-primary">View</a>';
+                        $buttons .= '
+                        <a class="btn btn-sm bg-gradient-primary"
+                            href="'.route('backend.admin.contributions.member.view', ['user' => $row->user_id]).'">
+                            <i class="fas fa-eye"></i>
+                            View
+                        </a>';
                     }
 
-                    // Edit button (optional)
+                    // Edit Contribution
                     if (auth()->user()->can('update-contribution')) {
-                        $buttons .= '<a href="#" class="btn btn-sm btn-warning">Edit</a>';
+                        $buttons .= '
+                        <a class="btn btn-sm bg-gradient-warning"
+                            href="'.route('backend.admin.contributions.edit', $row->id).'">
+                            <i class="fas fa-edit"></i>
+                            Edit
+                        </a>';
+                    }
+
+                    // Delete Contribution
+                    if (auth()->user()->can('delete-contribution')) {
+                        $buttons .= '
+                        <button class="btn btn-sm bg-gradient-danger deleteBtn"
+                            data-id="'.$row->id.'">
+                            <i class="fas fa-trash-alt"></i>
+                            Delete
+                        </button>';
                     }
 
                     $buttons .= '</div>';
+
                     return $buttons;
                 })
+
                 ->rawColumns(['status', 'action'])
                 ->toJson();
         }
@@ -91,7 +114,7 @@ class ContributionController extends Controller
                     ->addColumn('month_year', fn($row) => $row->month . ' / ' . $row->year)
                     ->addColumn('amount_due', fn($row) => number_format($row->amount_due, 2))
                     ->addColumn('penalty', fn($row) => number_format($row->penalty, 2))
-                    ->addColumn('total_paid', fn($row) => number_format($row->total_amount, 2))
+                    ->addColumn('total_paid', fn($row) => number_format($row->paid_amount, 2))
                     ->addColumn('payment_type', fn($row) => $row->status === 'paid' ? 'Full Payment' : 'Installment')
                     ->addColumn('status', fn($row) => $row->status === 'paid'
                         ? '<span class="badge badge-success">Paid</span>'
@@ -146,4 +169,21 @@ class ContributionController extends Controller
 
         return back()->with('success', 'Contribution settings updated successfully');
     }
-}
+
+    public function viewSettings()
+    {
+        abort_if(!Auth::user()->can('website_settings'), 403);
+        $settings = ContributionSetting::first();
+
+        return view('backend.contributions.view_settings', compact('settings'));
+    }
+
+    public function delete($id)
+    {
+        $contribution = MonthlyContribution::findOrFail($id);
+
+        $contribution->delete();
+
+        return redirect()->back()->with('success', 'Contribution deleted successfully.');
+    }
+    }

@@ -12,6 +12,8 @@ use App\Http\Controllers\Backend\UserManagementController;
 use App\Http\Controllers\Backend\CurrencyController;
 use App\Http\Controllers\Backend\WebsiteSettingController;
 use App\Http\Controllers\Backend\Member\ContributionController;
+use App\Http\Controllers\Backend\Member\MemberContributionPaymentController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -54,7 +56,31 @@ Route::prefix('admin')->as('backend.admin.')->middleware(['admin'])->group(funct
         // ADMIN - Contribution Settings
         Route::get('settings', [ContributionController::class, 'settings'])->name('contributions.settings'); // Admin only
         Route::post('settings', [ContributionController::class, 'updateSettings'])->name('contributions.settings.update'); // Admin only
+        Route::match(['get','post'], 'edit/{id}', [ContributionController::class, 'edit'])->name('contributions.edit');
+        Route::delete('delete/{id}', [ContributionController::class, 'delete'])->name('contributions.delete');
     });
+
+    // ====================== MEMBER CONTRIBUTION PAYMENTS ======================
+        Route::prefix('contributions/payments')->as('contributions.payments.')->group(function () {
+            // Member payment history list
+            Route::get('/', [MemberContributionPaymentController::class, 'index'])->name('index');
+            // Member make installment payment form
+            Route::get('create', [MemberContributionPaymentController::class, 'create'])->name('create');
+            // Member make installment payment POST
+            Route::post('pay', [MemberContributionPaymentController::class, 'pay'])->name('pay');
+            // View payments for a specific contribution month
+            Route::get('{contributionId}', [MemberContributionPaymentController::class, 'showContributionPayments'])->name('show');
+        });
+
+        // ADMIN - Contribution Settings
+        Route::prefix('contributions')->group(function () {
+            Route::get('settings', [ContributionController::class, 'settings'])->name('contributions.settings'); // shows the form
+            Route::post('settings', [ContributionController::class, 'updateSettings'])->name('contributions.settings.update'); // saves changes
+        });
+        
+        Route::get('contributions/settings/view', [ContributionController::class, 'viewSettings'])->name('contributions.settings.view');
+
+
 
     // Currencies
     Route::resource('currencies', CurrencyController::class);

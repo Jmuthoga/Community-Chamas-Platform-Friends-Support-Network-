@@ -54,4 +54,10 @@ class User extends Authenticatable
     {
         return imageRecover($this->profile_image);
     }
+
+    public function contributionPayments()
+    {
+        return $this->hasMany(ContributionPayment::class);
+    }
+
 }

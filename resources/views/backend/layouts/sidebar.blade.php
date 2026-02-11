@@ -43,7 +43,8 @@ $route = request()->route()->getName();
 
             @if (auth()->user()->hasAnyPermission([
                 'view-contribution-view',
-                'view-contribution-current'
+                'make-contribution-payment',
+                'view-contribution-payment-history',
             ]))
             <li class="nav-header text-white">CONTRIBUTIONS</li>
 
@@ -59,6 +60,15 @@ $route = request()->route()->getName();
                 </a>
 
                 <ul class="nav nav-treeview">
+                    @can('view-contribution-settings')
+                     <li class="nav-item">
+                        <a href="{{ route('backend.admin.contributions.settings.view') }}"
+                            class="nav-link {{ $route === 'backend.admin.contributions.settings.view' ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Contribution Agreement</p>
+                        </a>
+                    </li>
+                    @endcan
                     @can('view-contribution-view')
                     <li class="nav-item">
                         <a href="{{ route('backend.admin.contributions.index') }}"
@@ -69,12 +79,22 @@ $route = request()->route()->getName();
                     </li>
                     @endcan
 
-                    @can('view-contribution-current')
+                    @can('make-contribution-payment')
                     <li class="nav-item">
-                        <a href="{{ route('backend.admin.contributions.current', ['user' => $userId]) }}"
-                        class="nav-link {{ $route === 'backend.admin.contributions.current' ? 'active' : '' }}">
+                        <a href="{{ route('backend.admin.contributions.payments.create') }}"
+                        class="nav-link {{ $route === 'backend.admin.contributions.payments.create' ? 'active' : '' }}">
                             <i class="far fa-circle nav-icon"></i>
-                            <p>Current Month</p>
+                            <p>Make Payment</p>
+                        </a>
+                    </li>
+                    @endcan
+
+                    @can('view-contribution-payment-history')
+                    <li class="nav-item">
+                        <a href="{{ route('backend.admin.contributions.payments.index') }}"
+                        class="nav-link {{ $route === 'backend.admin.contributions.payments.index' ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>My Payment History</p>
                         </a>
                     </li>
                     @endcan
@@ -189,6 +209,32 @@ $route = request()->route()->getName();
                         </ul>
                     </li>
                     @endif
+                    {{-- ======================== CONTRIBUTION SETTINGS ======================== --}}
+                    @can('website_settings') 
+                    <li class="nav-item">
+                        <a href="#" class="nav-link d-flex justify-content-between align-items-center">
+                            <span>
+                                <i class="fas fa-cogs nav-icon"></i>
+                                Contributions
+                            </span>
+                            <span>
+                                <i class="fas fa-angle-left right"></i>
+                            </span>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+                            {{-- Edit / update settings --}}
+                            <li class="nav-item">
+                                <a href="{{ route('backend.admin.contributions.settings') }}"
+                                    class="nav-link {{ $route === 'backend.admin.contributions.settings' ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Edit Settings</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    @endcan
+
                     @if (auth()->user()->hasAnyPermission([
                     //user
                     'user_create',

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Penalty;
 use App\Models\MonthlyContribution;
 use App\Models\ContributionSetting;
+use App\Models\ContributionPayment;
 
 class ContributionService
 {
@@ -90,4 +91,52 @@ class ContributionService
             ]);
         }
     }
+
+    public function makeContribution(User $user, $amount)
+    {
+        $today = Carbon::now();
+
+        $settings = ContributionSetting::first();
+        $monthlyAmount = $settings->monthly_amount ?? 500;
+
+        $contribution = MonthlyContribution::firstOrCreate(
+            [
+                'user_id' => $user->id,
+                'month' => $today->month,
+                'year' => $today->year
+            ],
+            [
+                'amount_due' => $monthlyAmount,
+                'total_amount' => $monthlyAmount,
+                'paid_amount' => 0,
+                'penalty' => 0,
+                'status' => 'unpaid'
+            ]
+        );
+
+        $balance = $contribution->total_amount - $contribution->paid_amount;
+
+        if ($amount > $balance) {
+            throw new \Exception("Payment exceeds balance.");
+        }
+
+        // Save payment history
+        ContributionPayment::create([
+            'contribution_id' => $contribution->id,
+            'user_id' => $user->id,
+            'amount' => $amount,
+            'paid_at' => now()
+        ]);
+
+        // Update paid amount
+        $contribution->paid_amount += $amount;
+
+        if ($contribution->paid_amount >= $contribution->total_amount) {
+            $contribution->status = 'paid';
+            $contribution->paid_at = now();
+        }
+
+        $contribution->save();
+    }
+
 }

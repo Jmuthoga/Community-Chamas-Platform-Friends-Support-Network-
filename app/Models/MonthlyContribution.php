@@ -14,6 +14,7 @@ class MonthlyContribution extends Model
         'amount_due',
         'penalty',
         'total_amount',
+        'paid_amount',
         'status',
         'paid_at'
     ];
@@ -26,6 +27,16 @@ class MonthlyContribution extends Model
     public function penalties()
     {
         return $this->hasMany(Penalty::class, 'contribution_id');
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(ContributionPayment::class, 'contribution_id');
+    }
+
+    public function getBalanceAttribute()
+    {
+        return $this->total_amount - $this->paid_amount;
     }
 
     protected $casts = [
