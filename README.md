@@ -1,16 +1,14 @@
-# Authentication & Account Management System (Login • Dashboard • Account Settings)  
+# Community Chamas Platform Friends Support Network(FSN) (Login • Dashboard • Account Settings)  
 
 <p align="center">
   <a href="https://www.jminnovatechsolution.co.ke" target="_blank">
-    <img src="https://www.jminnovatechsolution.co.ke/assets/img/iconbg-512.png" width="300" alt="JM Innovatech Logo">
+    <img src="https://www.jminnovatechsolution.co.ke/assets/img/fsn.png" width="300" alt="Friends Support Network Logo">
   </a>
 </p>
 
 ## Overview
 
-
-
-## Social Authentication Support
+## FSN Authentication Support
 
 ### 1.Google-Registered Accounts
 - Supports users registered via Google OAuth
