@@ -114,13 +114,17 @@ class ContributionService
             ]
         );
 
+        // 🔥 Sync amount with settings
+        if ($contribution->paid_amount == 0) {
+            $contribution->amount_due = $monthlyAmount;
+        }
+
         $balance = $contribution->total_amount - $contribution->paid_amount;
 
         if ($amount > $balance) {
             throw new \Exception("Payment exceeds balance.");
         }
 
-        // Save payment history
         ContributionPayment::create([
             'contribution_id' => $contribution->id,
             'user_id' => $user->id,
@@ -128,7 +132,6 @@ class ContributionService
             'paid_at' => now()
         ]);
 
-        // Update paid amount
         $contribution->paid_amount += $amount;
 
         if ($contribution->paid_amount >= $contribution->total_amount) {
@@ -137,6 +140,8 @@ class ContributionService
         }
 
         $contribution->save();
-    }
 
+        // 🔥 REQUIRED
+        $contribution->refreshTotals();
+    }
 }

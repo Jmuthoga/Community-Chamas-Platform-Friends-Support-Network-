@@ -6,10 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
-
 use App\Models\ContributionPayment;
 use App\Models\MonthlyContribution;
 use App\Services\ContributionService;
+use App\Models\ContributionSetting;
 
 class MemberContributionPaymentController extends Controller
 {
@@ -29,8 +29,8 @@ class MemberContributionPaymentController extends Controller
             return DataTables::of($payments)
                 ->addIndexColumn()
                 ->addColumn('month_year', function ($row) {
-                    return $row->contribution->month . ' / ' . $row->contribution->year;
-                })
+                return optional($row->contribution)->month . ' / ' . optional($row->contribution)->year;
+            })
                 ->addColumn('amount', fn($row) => number_format($row->amount, 2))
                 ->addColumn('contribution_id', fn($row) => $row->contribution_id)
                 ->addColumn('paid_at', function ($row) {
@@ -39,8 +39,8 @@ class MemberContributionPaymentController extends Controller
                         : '-';
                 })
                 ->addColumn('status', function ($row) {
-                    return $row->contribution->status === 'paid'
-                        ? '<span class="badge badge-success">Completed</span>'
+                return optional($row->contribution)->status === 'paid'
+                    ? '<span class="badge badge-success">Completed</span>'
                         : '<span class="badge badge-warning">Installment</span>';
                 })
                 ->rawColumns(['status'])
@@ -52,27 +52,121 @@ class MemberContributionPaymentController extends Controller
 
 
     // ================= MAKE CONTRIBUTION PAYMENT =================
-    public function pay(Request $request, ContributionService $service)
+    public function create()
+    {
+        $userId = Auth::id();
+        $settings = ContributionSetting::firstOrFail();
+
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+
+        // Get current contribution for this month, or create if it doesn't exist
+        $contribution = MonthlyContribution::firstOrCreate(
+            [
+                'user_id' => $userId,
+                'month' => $currentMonth,
+                'year' => $currentYear,
+            ],
+            [
+                'amount_due' => $settings->monthly_amount,
+                'total_amount' => $settings->monthly_amount,
+                'paid_amount' => 0,
+                'status' => 'unpaid',
+                'penalty' => 0,
+            ]
+        );
+
+        // If contribution exists but is unpaid, update to match latest settings
+        if ($contribution->status === 'unpaid') {
+            $contribution->update([
+                'amount_due' => $settings->monthly_amount,
+            ]);
+        }
+
+        // Recalculate totals including penalties
+        if (method_exists($contribution, 'refreshTotals')) {
+            $contribution->refreshTotals();
+        }
+
+        // Balance now includes penalties
+        $contribution->balance = max(0, $contribution->total_amount - $contribution->paid_amount);
+
+        return view('backend.contributions.create_payment', compact('contribution'));
+    }
+
+    public function pay(Request $request)
     {
         abort_if(
             !Auth::user()->hasRole('Admin') &&
-            !Auth::user()->can('make-contribution-payment'),
+                !Auth::user()->can('make-contribution-payment'),
             403
         );
 
         $request->validate([
-            'amount' => 'required|numeric|min:1'
+            'amount' => 'required|numeric|min:1',
+            'payment_type' => 'required|in:installment,full'
         ]);
 
-        $service->makeContribution(
-            Auth::user(),
-            $request->amount
+        $user = Auth::user();
+        $settings = ContributionSetting::firstOrFail();
+
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+
+        // Get current contribution
+        $contribution = MonthlyContribution::firstOrCreate(
+            [
+                'user_id' => $user->id,
+                'month' => $currentMonth,
+                'year' => $currentYear,
+            ],
+            [
+                'amount_due' => $settings->monthly_amount,
+                'total_amount' => $settings->monthly_amount,
+                'paid_amount' => 0,
+                'status' => 'unpaid',
+                'penalty' => 0,
+            ]
         );
+
+        // Ensure totals are up-to-date
+        if (method_exists($contribution, 'refreshTotals')) {
+            $contribution->refreshTotals();
+        }
+
+        // Calculate balance including penalties
+        $balance = $contribution->total_amount - $contribution->paid_amount;
+
+        // Prevent overpayment
+        if ($request->amount > $balance) {
+            return back()->withErrors([
+                'amount' => 'You cannot pay more than the remaining balance of ' . number_format($balance, 2)
+            ]);
+        }
+
+        // Record payment
+        ContributionPayment::create([
+            'user_id' => $user->id,
+            'contribution_id' => $contribution->id,
+            'amount' => $request->amount,
+            'payment_type' => $request->payment_type,
+            'paid_at' => now()
+        ]);
+
+        // Update contribution
+        $contribution->paid_amount += $request->amount;
+
+        if ($contribution->paid_amount >= $contribution->total_amount) {
+            $contribution->status = 'paid';
+        }
+
+        $contribution->save();
 
         return redirect()
             ->route('backend.admin.contributions.payments.index')
-            ->with('success', 'Contribution recorded successfully');
+            ->with('success', 'Contribution payment recorded successfully');
     }
+
 
     // ================= VIEW SINGLE CONTRIBUTION PAYMENTS =================
     public function showContributionPayments($contributionId)
@@ -95,30 +189,4 @@ class MemberContributionPaymentController extends Controller
             compact('payments', 'contribution', 'user', 'totalContributed')
         );
     }
-
-    public function create()
-    {
-        $userId = Auth::id();
-        $currentMonth = now()->month;
-        $currentYear = now()->year;
-
-        // Get existing contribution or create default for current month
-        $contribution = MonthlyContribution::firstOrCreate(
-            [
-                'user_id' => $userId,
-                'month' => $currentMonth,
-                'year' => $currentYear,
-            ],
-            [
-                'amount_due' => 500,       // default monthly amount
-                'total_amount' => 500,     // default total
-                'status' => 'unpaid',
-                'total_paid' => 0,
-                'penalty' => 0,
-            ]
-        );
-
-        return view('backend.contributions.create_payment', compact('contribution'));
-    }
-
 }

@@ -60,7 +60,7 @@ $route = request()->route()->getName();
                 </a>
 
                 <ul class="nav nav-treeview">
-                    @can('view-contribution-settings')
+                    @can('contribution_agreement')
                      <li class="nav-item">
                         <a href="{{ route('backend.admin.contributions.settings.view') }}"
                             class="nav-link {{ $route === 'backend.admin.contributions.settings.view' ? 'active' : '' }}">

@@ -52,7 +52,7 @@ class ContributionController extends Controller
                     if (auth()->user()->can('view-contribution-current')) {
                         $buttons .= '
                         <a class="btn btn-sm bg-gradient-primary"
-                            href="'.route('backend.admin.contributions.member.view', ['user' => $row->user_id]).'">
+                            href="' . route('backend.admin.contributions.member.view', ['user' => $row->user_id]) . '">
                             <i class="fas fa-eye"></i>
                             View
                         </a>';
@@ -62,7 +62,7 @@ class ContributionController extends Controller
                     if (auth()->user()->can('update-contribution')) {
                         $buttons .= '
                         <a class="btn btn-sm bg-gradient-warning"
-                            href="'.route('backend.admin.contributions.edit', $row->id).'">
+                            href="' . route('backend.admin.contributions.edit', $row->id) . '">
                             <i class="fas fa-edit"></i>
                             Edit
                         </a>';
@@ -72,7 +72,7 @@ class ContributionController extends Controller
                     if (auth()->user()->can('delete-contribution')) {
                         $buttons .= '
                         <button class="btn btn-sm bg-gradient-danger deleteBtn"
-                            data-id="'.$row->id.'">
+                            data-id="' . $row->id . '">
                             <i class="fas fa-trash-alt"></i>
                             Delete
                         </button>';
@@ -120,7 +120,8 @@ class ContributionController extends Controller
                         ? '<span class="badge badge-success">Paid</span>'
                         : '<span class="badge badge-danger">Unpaid</span>')
                     ->addColumn('payment_date', function ($row) {
-                        return $row->paid_at ? \Carbon\Carbon::parse($row->paid_at)->format('d M Y') : '-';
+                        $lastPayment = $row->payments()->latest('paid_at')->first();
+                        return $lastPayment ? $lastPayment->paid_at->format('d M Y H:i:s') : '-';
                     })
                     ->rawColumns(['status'])
                     ->make(true);
@@ -144,13 +145,23 @@ class ContributionController extends Controller
     public function settings()
     {
         abort_if(!Auth::user()->can('website_settings'), 403);
-        $settings = ContributionSetting::first();
+
+        $settings = ContributionSetting::firstOrCreate([
+            'id' => 1
+        ], [
+            'monthly_amount' => 0,
+            'penalty_per_day' => 0,
+            'due_day' => 5,
+            'grace_day' => 16
+        ]);
+
         return view('backend.contributions.settings', compact('settings'));
     }
 
     public function updateSettings(Request $request)
     {
         abort_if(!Auth::user()->can('website_settings'), 403);
+
         $settings = ContributionSetting::first();
 
         $request->validate([
@@ -167,12 +178,27 @@ class ContributionController extends Controller
             'grace_day'
         ]));
 
+        //Update ALL unpaid contributions automatically
+        MonthlyContribution::where('status', 'unpaid')
+            ->get()
+            ->each(function ($contribution) use ($settings) {
+
+                $penalty = $contribution->calculatePenalty();
+
+                $contribution->update([
+                    'amount_due' => $settings->monthly_amount,
+                    'penalty' => $penalty,
+                    'total_amount' => $settings->monthly_amount + $penalty
+                ]);
+            });
+
         return back()->with('success', 'Contribution settings updated successfully');
     }
 
+
     public function viewSettings()
     {
-        abort_if(!Auth::user()->can('website_settings'), 403);
+        abort_if(!Auth::user()->can('contribution_agreement'), 403);
         $settings = ContributionSetting::first();
 
         return view('backend.contributions.view_settings', compact('settings'));
@@ -186,4 +212,4 @@ class ContributionController extends Controller
 
         return redirect()->back()->with('success', 'Contribution deleted successfully.');
     }
-    }
+}

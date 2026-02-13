@@ -1,6 +1,6 @@
 @extends('backend.master')
 
-@section('title', 'User Management')
+@section('title', 'Friends Support Network Members')
 
 @section('content')
 

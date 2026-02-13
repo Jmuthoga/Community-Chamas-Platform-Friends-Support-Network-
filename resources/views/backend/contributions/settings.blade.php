@@ -6,14 +6,6 @@
 <div class="card shadow-sm border-0 rounded-lg">
     <div class="card-body">
 
-        {{-- Success Message --}}
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-
         {{-- Validation Errors --}}
         @if($errors->any())
             <div class="alert alert-danger">
