@@ -11,6 +11,10 @@ use App\Models\MonthlyContribution;
 use App\Services\ContributionService;
 use App\Models\ContributionSetting;
 use App\Services\MpesaService;
+use App\Mail\ContributionNotificationMail;
+use App\Mail\ContributionSummaryMail;
+use Illuminate\Support\Facades\Mail;
+
 
 class MemberContributionPaymentController extends Controller
 {
@@ -147,10 +151,10 @@ class MemberContributionPaymentController extends Controller
         }
 
         /*
-    |--------------------------------------------------------------------------
-    | CASH PAYMENT
-    |--------------------------------------------------------------------------
-    */
+        |----------------------------------------------------------------------
+        | CASH PAYMENT
+        |----------------------------------------------------------------------
+        */
         if ($request->payment_method === 'cash') {
 
             ContributionPayment::create([
@@ -170,16 +174,48 @@ class MemberContributionPaymentController extends Controller
 
             $contribution->save();
 
+            // ================= SEND EMAIL WITH LIVE MONTHLY STATS =================
+            $monthYear = $contribution->month . ' / ' . $contribution->year;
+            $totalAllTime = \App\Models\MonthlyContribution::sum('paid_amount');
+            $totalPenalties = \App\Models\MonthlyContribution::where('month', now()->month)
+                                ->where('year', now()->year)
+                                ->sum('penalty');
+            
+            $mailData = [
+                'user' => $user,
+                'name' => $user->name,
+                'userName' => $user->name,
+                'monthYear' => $monthYear,
+                'amount' => $request->amount,
+                'payment_type' => $request->payment_type,
+                'dashboardUrl' => route('backend.admin.contributions.payments.index'),
+                'totalAllTime' => $totalAllTime,
+                'totalPenalties' => $totalPenalties,
+            ];
+                        
+            // Merge live monthly stats
+            $mailData = array_merge($mailData, $this->getMonthlyStats());
+
+            
+            // Send notification
+            Mail::to($user->email)->queue(new ContributionNotificationMail($mailData));
+            
+            // Send summary if fully paid
+            if ($contribution->status === 'paid') {
+                Mail::to($user->email)->queue(new ContributionSummaryMail($mailData));
+            }
+
+
             return redirect()
                 ->route('backend.admin.contributions.payments.index')
                 ->with('success', 'Contribution payment recorded successfully');
         }
 
         /*
-    |--------------------------------------------------------------------------
-    | MPESA PAYMENT
-    |--------------------------------------------------------------------------
-    */
+        |----------------------------------------------------------------------
+        | MPESA PAYMENT
+        |----------------------------------------------------------------------
+        */
 
         // Determine phone
         $phone = $request->mpesa_phone ?: $user->phone;
@@ -308,59 +344,92 @@ class MemberContributionPaymentController extends Controller
     public function handleStkCallback(Request $request)
     {
         $payload = $request->all();
-    
+
         \Log::info('MPESA CALLBACK:', $payload);
-    
+
         $callback = $payload['Body']['stkCallback'] ?? null;
-    
+
         if (!$callback) {
             return response()->json(['message' => 'Invalid callback']);
         }
-    
+
         $checkoutId = $callback['CheckoutRequestID'];
         $resultCode = $callback['ResultCode'];
-    
+
         // Find pending payment
         $payment = ContributionPayment::where('checkout_request_id', $checkoutId)->first();
-    
+
         if (!$payment) {
             return response()->json(['message' => 'Payment not found']);
         }
-    
+
+        // Get user from payment
+        $user = $payment->user;
+
         /*
         |--------------------------------------------------------------------------
         | SUCCESSFUL PAYMENT
         |--------------------------------------------------------------------------
         */
         if ($resultCode == 0) {
-    
+
             $items = collect($callback['CallbackMetadata']['Item'] ?? []);
-    
+
             $receipt = optional(
                 $items->firstWhere('Name', 'MpesaReceiptNumber')
             )['Value'];
-    
+
             $payment->update([
                 'mpesa_receipt' => $receipt,
                 'status' => 'completed',
                 'paid_at' => now()
             ]);
-    
+
             // Update contribution totals
             $contribution = MonthlyContribution::find($payment->contribution_id);
-    
+
             if ($contribution) {
-    
+
                 $contribution->paid_amount += $payment->amount;
-    
+
                 if ($contribution->paid_amount >= $contribution->total_amount) {
                     $contribution->status = 'paid';
                 }
-    
+
                 $contribution->save();
+
+                // Prepare email data
+                $monthYear = optional($contribution)->month . ' / ' . optional($contribution)->year;
+                $totalAllTime = \App\Models\MonthlyContribution::sum('paid_amount');
+                $totalPenalties = \App\Models\MonthlyContribution::where('month', now()->month)
+                                    ->where('year', now()->year)
+                                    ->sum('penalty');
+
+                $mailData = [
+                    'user' => $user,
+                    'name' => $user->name,
+                    'userName' => $user->name,
+                    'monthYear' => $monthYear,
+                    'amount' => $payment->amount,
+                    'payment_type' => $payment->payment_type,
+                    'dashboardUrl' => route('backend.admin.contributions.payments.index'),
+                    'totalAllTime' => $totalAllTime,
+                    'totalPenalties' => $totalPenalties
+                ];
+
+                // Merge live monthly stats
+                $mailData = array_merge($mailData, $this->getMonthlyStats());
+
+                // Send notification
+                Mail::to($user->email)->queue(new ContributionNotificationMail($mailData));
+
+                // Send summary if fully paid
+                if ($contribution->status === 'paid') {
+                    Mail::to($user->email)->queue(new ContributionSummaryMail($mailData));
+                }
             }
         }
-    
+
         /*
         |--------------------------------------------------------------------------
         | FAILED / CANCELLED PAYMENT
@@ -371,9 +440,10 @@ class MemberContributionPaymentController extends Controller
                 'status' => 'failed'
             ]);
         }
-    
+
         return response()->json(['message' => 'Callback processed']);
     }
+
 
     // ================= CHECK PAYMENT STATUS =================
     public function checkPaymentStatus($checkoutId)
@@ -411,4 +481,27 @@ class MemberContributionPaymentController extends Controller
             compact('payments', 'contribution', 'user', 'totalContributed')
         );
     }
+
+    // ================= HELPER: GET LIVE MONTHLY STATS =================
+    private function getMonthlyStats()
+    {
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+
+        $totalMembers = \App\Models\User::count();
+        $contributedCount = \App\Models\MonthlyContribution::where('month', $currentMonth)
+                            ->where('year', $currentYear)
+                            ->where('paid_amount', '>', 0)
+                            ->count();
+        $remainingCount = $totalMembers - $contributedCount;
+        $totalCollected = \App\Models\MonthlyContribution::where('month', $currentMonth)
+                            ->where('year', $currentYear)
+                            ->sum('paid_amount');
+        $remainingBalance = \App\Models\MonthlyContribution::where('month', $currentMonth)
+                            ->where('year', $currentYear)
+                            ->sum(\DB::raw('total_amount - paid_amount'));
+
+        return compact('totalMembers','contributedCount','remainingCount','totalCollected','remainingBalance');
+    }
+
 }
