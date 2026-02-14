@@ -123,7 +123,18 @@ class ContributionController extends Controller
                         $lastPayment = $row->payments()->latest('paid_at')->first();
                         return $lastPayment ? $lastPayment->paid_at->format('d M Y H:i:s') : '-';
                     })
-                    ->rawColumns(['status'])
+                    ->addColumn('mpesa_transaction', function($row) {
+                        $payment = $row->payments()->latest()->first();
+                        if($payment && $payment->mpesa_receipt) {
+                            return '<div style="display:flex; flex-direction:column; align-items:center; text-align:center;">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" 
+                                             width="70" style="object-fit:contain; margin-bottom:5px;">
+                                        <span style="font-weight:400; color:#000000;">'.$payment->mpesa_receipt.'</span>
+                                    </div>';
+                        }
+                        return '-';
+                    })
+                    ->rawColumns(['status','mpesa_transaction'])
                     ->make(true);
             } catch (\Exception $e) {
                 // Send JSON error for debugging DataTables

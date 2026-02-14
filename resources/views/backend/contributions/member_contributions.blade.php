@@ -25,6 +25,7 @@
                 <th>Payment Type</th>
                 <th>Status</th>
                 <th>Payment Date</th>
+                <th>Transaction (Safaricom MPESA)</th> 
             </tr>
         </thead>
         <tbody></tbody>
@@ -47,7 +48,8 @@ $(document).ready(function() {
             { data: 'total_paid', name: 'total_paid' },
             { data: 'payment_type', name: 'payment_type' },
             { data: 'status', name: 'status', orderable: false, searchable: false },
-            { data: 'payment_date', name: 'payment_date' }
+            { data: 'payment_date', name: 'payment_date' },
+            { data: 'mpesa_transaction', name: 'mpesa_transaction', orderable: false, searchable: false } // NEW
         ],
         order: [[1, 'asc']],
         language: { emptyTable: "No contributions found" }

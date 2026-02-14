@@ -9,12 +9,16 @@ class ContributionPayment extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'contribution_id',
-        'user_id',
-        'amount',
-        'paid_at'
-    ];
+        protected $fillable = [
+            'contribution_id',
+            'user_id',
+            'amount',
+            'paid_at',
+            'checkout_request_id',
+            'mpesa_receipt',
+            'phone',
+            'status'
+        ];
 
     // Payment belongs to Monthly Contribution
     public function contribution()

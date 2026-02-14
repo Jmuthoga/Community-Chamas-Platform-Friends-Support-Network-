@@ -69,6 +69,10 @@ Route::prefix('admin')->as('backend.admin.')->middleware(['admin'])->group(funct
             Route::get('settings/view', [ContributionController::class, 'viewSettings'])->name('contributions.settings.view');
         });
         
+        // ====================== MPESA PAYMENTS ======================
+        Route::post('/payment/stk-callback', [MemberContributionPaymentController::class, 'handleStkCallback']);
+        Route::post('/mpesa/stk-push', [MemberContributionPaymentController::class, 'stkPush'])->name('mpesa.stk.push')->middleware(['auth']);
+        Route::get('check-payment-status/{checkoutId}',[MemberContributionPaymentController::class, 'checkPaymentStatus'])->name('mpesa.check.status');
         
         // ====================== CURRENCIES ======================
         Route::resource('currencies', CurrencyController::class);

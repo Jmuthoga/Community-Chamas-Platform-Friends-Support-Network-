@@ -10,6 +10,7 @@ use App\Models\ContributionPayment;
 use App\Models\MonthlyContribution;
 use App\Services\ContributionService;
 use App\Models\ContributionSetting;
+use App\Services\MpesaService;
 
 class MemberContributionPaymentController extends Controller
 {
@@ -94,7 +95,7 @@ class MemberContributionPaymentController extends Controller
         return view('backend.contributions.create_payment', compact('contribution'));
     }
 
-    public function pay(Request $request)
+    public function pay(Request $request, MpesaService $mpesa)
     {
         abort_if(
             !Auth::user()->hasRole('Admin') &&
@@ -104,7 +105,9 @@ class MemberContributionPaymentController extends Controller
 
         $request->validate([
             'amount' => 'required|numeric|min:1',
-            'payment_type' => 'required|in:installment,full'
+            'payment_type' => 'required|in:installment,full',
+            'payment_method' => 'required|in:cash,mpesa',
+            'mpesa_phone' => 'nullable|string'
         ]);
 
         $user = Auth::user();
@@ -113,7 +116,7 @@ class MemberContributionPaymentController extends Controller
         $currentMonth = now()->month;
         $currentYear = now()->year;
 
-        // Get current contribution
+        // ================= GET CONTRIBUTION =================
         $contribution = MonthlyContribution::firstOrCreate(
             [
                 'user_id' => $user->id,
@@ -129,44 +132,263 @@ class MemberContributionPaymentController extends Controller
             ]
         );
 
-        // Ensure totals are up-to-date
+        // Refresh totals including penalties
         if (method_exists($contribution, 'refreshTotals')) {
             $contribution->refreshTotals();
         }
 
-        // Calculate balance including penalties
         $balance = $contribution->total_amount - $contribution->paid_amount;
 
-        // Prevent overpayment
+        // ================= PREVENT OVERPAYMENT =================
         if ($request->amount > $balance) {
             return back()->withErrors([
-                'amount' => 'You cannot pay more than the remaining balance of ' . number_format($balance, 2)
+                'amount' => 'You cannot pay more than remaining balance of ' . number_format($balance, 2)
             ]);
         }
 
-        // Record payment
+        /*
+    |--------------------------------------------------------------------------
+    | CASH PAYMENT
+    |--------------------------------------------------------------------------
+    */
+        if ($request->payment_method === 'cash') {
+
+            ContributionPayment::create([
+                'user_id' => $user->id,
+                'contribution_id' => $contribution->id,
+                'amount' => $request->amount,
+                'payment_type' => $request->payment_type,
+                'paid_at' => now(),
+                'status' => 'completed'
+            ]);
+
+            $contribution->paid_amount += $request->amount;
+
+            if ($contribution->paid_amount >= $contribution->total_amount) {
+                $contribution->status = 'paid';
+            }
+
+            $contribution->save();
+
+            return redirect()
+                ->route('backend.admin.contributions.payments.index')
+                ->with('success', 'Contribution payment recorded successfully');
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | MPESA PAYMENT
+    |--------------------------------------------------------------------------
+    */
+
+        // Determine phone
+        $phone = $request->mpesa_phone ?: $user->phone;
+        
+        // Normalize phone format
+        $phone = preg_replace('/\D/', '', $phone);
+        
+        if (substr($phone, 0, 1) == '0') {
+            $phone = '254' . substr($phone, 1);
+        }
+        
+        if (substr($phone, 0, 3) == '254') {
+            // Valid Kenyan format
+        }
+
+        // Send STK Push
+        $stkResponse = $mpesa->stkPush(
+            $phone,
+            $request->amount,
+            "CONTRIB-" . $contribution->id,
+            "Contribution Payment"
+        );
+
+        // Check if Safaricom accepted request
+        if (!isset($stkResponse['CheckoutRequestID'])) {
+            return back()->withErrors([
+                'mpesa' => 'Failed to initiate MPESA request. Try again.'
+            ]);
+        }
+
+        // Save pending payment
         ContributionPayment::create([
             'user_id' => $user->id,
             'contribution_id' => $contribution->id,
             'amount' => $request->amount,
             'payment_type' => $request->payment_type,
-            'paid_at' => now()
+            'phone' => $phone,
+            'checkout_request_id' => $stkResponse['CheckoutRequestID'],
+            'status' => 'pending'
         ]);
 
-        // Update contribution
-        $contribution->paid_amount += $request->amount;
-
-        if ($contribution->paid_amount >= $contribution->total_amount) {
-            $contribution->status = 'paid';
-        }
-
-        $contribution->save();
-
-        return redirect()
-            ->route('backend.admin.contributions.payments.index')
-            ->with('success', 'Contribution payment recorded successfully');
+        return back()->with('success', 'STK Push sent. Please complete payment on your phone.');
     }
 
+    public function stkPush(Request $request, MpesaService $mpesa)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+            'amount' => 'required|numeric|min:1'
+        ]);
+
+        $user = Auth::user();
+        $settings = ContributionSetting::firstOrFail();
+
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+
+        $contribution = MonthlyContribution::firstOrCreate(
+            [
+                'user_id' => $user->id,
+                'month' => $currentMonth,
+                'year' => $currentYear,
+            ],
+            [
+                'amount_due' => $settings->monthly_amount,
+                'total_amount' => $settings->monthly_amount,
+                'paid_amount' => 0,
+                'status' => 'unpaid',
+                'penalty' => 0,
+            ]
+        );
+
+        if (method_exists($contribution, 'refreshTotals')) {
+            $contribution->refreshTotals();
+        }
+
+        $balance = $contribution->total_amount - $contribution->paid_amount;
+
+        if ($request->amount > $balance) {
+            return response()->json([
+                'error' => 'Cannot pay more than remaining balance of ' . number_format($balance, 2)
+            ], 422);
+        }
+
+        // Normalize phone format
+        $phone = preg_replace('/\D/', '', $request->phone);
+        
+        if (substr($phone, 0, 1) == '0') {
+            $phone = '254' . substr($phone, 1);
+        }
+        
+        if (substr($phone, 0, 3) == '254') {
+            // Valid Kenyan format
+        }
+
+        $stkResponse = $mpesa->stkPush(
+            $phone,
+            $request->amount,
+            "CONTRIB-" . $contribution->id,
+            "Contribution Payment"
+        );
+
+        if (!isset($stkResponse['CheckoutRequestID'])) {
+            return response()->json([
+                'error' => 'Failed to initiate MPESA request.'
+            ], 500);
+        }
+
+        ContributionPayment::create([
+            'user_id' => $user->id,
+            'contribution_id' => $contribution->id,
+            'amount' => $request->amount,
+            'payment_type' => 'installment', // or fetch from request if needed
+            'phone' => $phone,
+            'checkout_request_id' => $stkResponse['CheckoutRequestID'],
+            'status' => 'pending'
+        ]);
+
+        return response()->json([
+            'message' => 'STK Push sent',
+            'checkout_request_id' => $stkResponse['CheckoutRequestID']
+        ]);
+    }
+    
+    // ================= MPESA STK CALLBACK =================
+    public function handleStkCallback(Request $request)
+    {
+        $payload = $request->all();
+    
+        \Log::info('MPESA CALLBACK:', $payload);
+    
+        $callback = $payload['Body']['stkCallback'] ?? null;
+    
+        if (!$callback) {
+            return response()->json(['message' => 'Invalid callback']);
+        }
+    
+        $checkoutId = $callback['CheckoutRequestID'];
+        $resultCode = $callback['ResultCode'];
+    
+        // Find pending payment
+        $payment = ContributionPayment::where('checkout_request_id', $checkoutId)->first();
+    
+        if (!$payment) {
+            return response()->json(['message' => 'Payment not found']);
+        }
+    
+        /*
+        |--------------------------------------------------------------------------
+        | SUCCESSFUL PAYMENT
+        |--------------------------------------------------------------------------
+        */
+        if ($resultCode == 0) {
+    
+            $items = collect($callback['CallbackMetadata']['Item'] ?? []);
+    
+            $receipt = optional(
+                $items->firstWhere('Name', 'MpesaReceiptNumber')
+            )['Value'];
+    
+            $payment->update([
+                'mpesa_receipt' => $receipt,
+                'status' => 'completed',
+                'paid_at' => now()
+            ]);
+    
+            // Update contribution totals
+            $contribution = MonthlyContribution::find($payment->contribution_id);
+    
+            if ($contribution) {
+    
+                $contribution->paid_amount += $payment->amount;
+    
+                if ($contribution->paid_amount >= $contribution->total_amount) {
+                    $contribution->status = 'paid';
+                }
+    
+                $contribution->save();
+            }
+        }
+    
+        /*
+        |--------------------------------------------------------------------------
+        | FAILED / CANCELLED PAYMENT
+        |--------------------------------------------------------------------------
+        */
+        else {
+            $payment->update([
+                'status' => 'failed'
+            ]);
+        }
+    
+        return response()->json(['message' => 'Callback processed']);
+    }
+
+    // ================= CHECK PAYMENT STATUS =================
+    public function checkPaymentStatus($checkoutId)
+    {
+        $payment = ContributionPayment::where('checkout_request_id', $checkoutId)->first();
+    
+        if (!$payment) {
+            return response()->json(['status' => 'not_found']);
+        }
+    
+        return response()->json([
+            'status' => $payment->status,
+            'receipt' => $payment->mpesa_receipt
+        ]);
+    }
 
     // ================= VIEW SINGLE CONTRIBUTION PAYMENTS =================
     public function showContributionPayments($contributionId)

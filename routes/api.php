@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Backend\Pos\MpesaController;
-use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\Backend\Member\MemberContributionPaymentController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -17,4 +16,5 @@ use App\Http\Controllers\SubscriptionController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
 
