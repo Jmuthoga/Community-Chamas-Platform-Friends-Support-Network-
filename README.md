@@ -33,7 +33,7 @@ Copy the Client ID and Secret into your project's `.env` file:
 
 ### 1. **Clone the repository**
 ```bash
-git clone git@github.com:Jmuthoga/Authentication-Account-Management-System.git
+git clone git@github.com:Jmuthoga/Community-Chamas-Platform-Friends-Support-Network-.git
 cd -Authentication-Account-Management-System
 ```
 ### 2. **Install dependencies**
@@ -45,12 +45,12 @@ cd -Authentication-Account-Management-System
 ### 3. **Configure .env**
   ```bash
     # App Configuration
-    APP_NAME=Authentication
+    APP_NAME="FRIENDS SUPPORT NETWORK(FSN)"
     APP_ENV=local
     APP_KEY=base64:YOUR_APP_KEY
     APP_DEBUG=true
     APP_URL=http://localhost:8000
-    WEBSITE_NAME="Authentication & Account Management System"
+    WEBSITE_NAME="FRIENDS SUPPORT NETWORK(FSN)"
     
     # Database
     DB_CONNECTION=mysql
