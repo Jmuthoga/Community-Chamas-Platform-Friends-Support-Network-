@@ -106,6 +106,18 @@
         background-color: #e6f0fa;
         border-color: var(--fsn-blue);
     }
+    
+    .authentications {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+        
+    .authentications .right-content {
+        width: 100%;
+        max-width: 750px;
+    }
 
 </style>
 
@@ -116,11 +128,11 @@
 
     <!-- AUTHENTICATION-START (LOGIN) -->
     <section class="authentications">
-        <div class="left-content">
-            <figure class="">
-                <img src="{{ asset('assets/images/authentication/poss.png') }}" alt="register image ">
-            </figure>
-        </div>
+        <!--<div class="left-content">-->
+        <!--    <figure class="">-->
+        <!--        <img src="{{ asset('assets/images/authentication/poss.png') }}" alt="register image ">-->
+        <!--    </figure>-->
+        <!--</div>-->
         <div class="right-content">
             <form action="{{ route('password.reset') }}" method="post" class="authentication-form px-lg-5 forgot-form">
                 @csrf

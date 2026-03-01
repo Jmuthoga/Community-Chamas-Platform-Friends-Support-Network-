@@ -1,0 +1,32 @@
+[14-Feb-2026 15:31:08 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/DashboardController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/DashboardController.php on line 10
+[14-Feb-2026 15:31:09 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/CurrencyController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/CurrencyController.php on line 11
+[14-Feb-2026 18:50:40 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/UserManagementController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/UserManagementController.php on line 13
+[14-Feb-2026 18:50:40 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/WebsiteSettingController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/WebsiteSettingController.php on line 11
+[18-Feb-2026 05:06:21 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/WebsiteSettingController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/WebsiteSettingController.php on line 11
+[18-Feb-2026 05:28:46 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/CurrencyController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/CurrencyController.php on line 11
+[18-Feb-2026 05:28:49 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/DashboardController.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/DashboardController.php on line 12
+[18-Feb-2026 05:28:57 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/UserManagementController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/UserManagementController.php on line 13

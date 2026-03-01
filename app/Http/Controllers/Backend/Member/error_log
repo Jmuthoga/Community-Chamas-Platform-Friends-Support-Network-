@@ -1,0 +1,16 @@
+[14-Feb-2026 17:09:33 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/Member/MemberContributionPaymentController.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/Member/MemberContributionPaymentController.php on line 19
+[14-Feb-2026 18:52:02 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/Member/ContributionController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/Member/ContributionController.php on line 13
+[18-Feb-2026 05:41:41 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/Member/ContributionController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/Member/ContributionController.php on line 13
+[18-Feb-2026 05:42:40 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/Member/MemberContributionPaymentController.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/Member/MemberContributionPaymentController.php on line 19

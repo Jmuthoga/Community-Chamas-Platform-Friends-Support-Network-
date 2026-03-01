@@ -1,0 +1,32 @@
+[14-Feb-2026 10:33:48 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/GoogleController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/GoogleController.php on line 13
+[14-Feb-2026 10:34:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Routing\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Controller.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Controller.php on line 9
+[14-Feb-2026 10:34:08 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/AuthController.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/AuthController.php on line 18
+[14-Feb-2026 10:34:28 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/TestController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/TestController.php on line 15
+[18-Feb-2026 04:16:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Routing\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Controller.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Controller.php on line 9
+[18-Feb-2026 04:28:16 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/GoogleController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/GoogleController.php on line 13
+[18-Feb-2026 04:48:45 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/TestController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/TestController.php on line 15
+[18-Feb-2026 05:10:33 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/AuthController.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/AuthController.php on line 18

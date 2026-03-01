@@ -201,10 +201,14 @@ class MemberContributionPaymentController extends Controller
             Mail::to($user->email)->queue(new ContributionNotificationMail($mailData));
             
             // Send summary if fully paid
-            if ($contribution->status === 'paid') {
-                Mail::to($user->email)->queue(new ContributionSummaryMail($mailData));
+            if ($this->isMonthFullyPaid()) {
+            
+                $users = \App\Models\User::pluck('email');
+            
+                foreach ($users as $email) {
+                    Mail::to($email)->queue(new ContributionSummaryMail($mailData));
+                }
             }
-
 
             return redirect()
                 ->route('backend.admin.contributions.payments.index')
@@ -424,8 +428,13 @@ class MemberContributionPaymentController extends Controller
                 Mail::to($user->email)->queue(new ContributionNotificationMail($mailData));
 
                 // Send summary if fully paid
-                if ($contribution->status === 'paid') {
-                    Mail::to($user->email)->queue(new ContributionSummaryMail($mailData));
+                if ($this->isMonthFullyPaid()) {
+                
+                    $users = \App\Models\User::pluck('email');
+                
+                    foreach ($users as $email) {
+                        Mail::to($email)->queue(new ContributionSummaryMail($mailData));
+                    }
                 }
             }
         }
@@ -502,6 +511,21 @@ class MemberContributionPaymentController extends Controller
                             ->sum(\DB::raw('total_amount - paid_amount'));
 
         return compact('totalMembers','contributedCount','remainingCount','totalCollected','remainingBalance');
+    }
+    
+    private function isMonthFullyPaid()
+    {
+        $month = now()->month;
+        $year = now()->year;
+    
+        $totalMembers = \App\Models\User::count();
+    
+        $fullyPaidMembers = \App\Models\MonthlyContribution::where('month', $month)
+            ->where('year', $year)
+            ->whereColumn('paid_amount', '>=', 'total_amount')
+            ->count();
+    
+        return $totalMembers === $fullyPaidMembers;
     }
 
 }

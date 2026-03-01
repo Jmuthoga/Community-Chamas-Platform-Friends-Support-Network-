@@ -1,0 +1,8 @@
+[15-Feb-2026 03:52:28 UTC] PHP Fatal error:  Uncaught Error: Interface "Maatwebsite\Excel\Concerns\FromCollection" not found in /home/pvxkzubm/public_html/friends/app/Exports/DemoProductsExport.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Exports/DemoProductsExport.php on line 9
+[18-Feb-2026 04:10:00 UTC] PHP Fatal error:  Uncaught Error: Interface "Maatwebsite\Excel\Concerns\FromCollection" not found in /home/pvxkzubm/public_html/friends/app/Exports/DemoProductsExport.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Exports/DemoProductsExport.php on line 9

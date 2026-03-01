@@ -1,0 +1,8 @@
+[14-Feb-2026 18:52:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Console\Kernel" not found in /home/pvxkzubm/public_html/friends/app/Console/Kernel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Console/Kernel.php on line 8
+[18-Feb-2026 04:08:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Console\Kernel" not found in /home/pvxkzubm/public_html/friends/app/Console/Kernel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Console/Kernel.php on line 8

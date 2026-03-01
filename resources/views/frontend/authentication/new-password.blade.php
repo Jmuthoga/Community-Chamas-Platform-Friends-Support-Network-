@@ -103,11 +103,11 @@
 
     <!-- AUTHENTICATION-START (LOGIN) -->
     <section class="authentications">
-        <div class="left-content">
-            <figure class="">
-                <img src="{{ asset('assets/images/authentication/pos.png') }}" alt="register image ">
-            </figure>
-        </div>
+        <!--<div class="left-content">-->
+        <!--    <figure class="">-->
+        <!--        <img src="{{ asset('assets/images/authentication/pos.png') }}" alt="register image ">-->
+        <!--    </figure>-->
+        <!--</div>-->
         <div class="right-content">
             <form action="{{ route('new.password') }}" method="post" class="authentication-form px-lg-5"
                 id="resetPasswordForm needs-validation" novalidate>

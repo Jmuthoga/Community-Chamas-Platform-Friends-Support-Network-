@@ -8,7 +8,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4>Welcome back, {{ Auth::user()->name }} 👋</h4>
-</div
+</div>
 
 @can('dashboard_view')
 

@@ -1,0 +1,8 @@
+[13-Feb-2026 23:50:18 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Validation\Rule" not found in /home/pvxkzubm/public_html/friends/app/Rules/ValidImageType.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Rules/ValidImageType.php on line 8
+[18-Feb-2026 04:35:22 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Validation\Rule" not found in /home/pvxkzubm/public_html/friends/app/Rules/ValidImageType.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Rules/ValidImageType.php on line 8

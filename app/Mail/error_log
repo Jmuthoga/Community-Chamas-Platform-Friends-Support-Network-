@@ -1,0 +1,16 @@
+[14-Feb-2026 18:58:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Mail\Mailable" not found in /home/pvxkzubm/public_html/friends/app/Mail/PasswordReset.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Mail/PasswordReset.php on line 12
+[18-Feb-2026 02:05:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Mail\Mailable" not found in /home/pvxkzubm/public_html/friends/app/Mail/ContributionNotificationMail.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Mail/ContributionNotificationMail.php on line 12
+[18-Feb-2026 03:23:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Mail\Mailable" not found in /home/pvxkzubm/public_html/friends/app/Mail/ContributionSummaryMail.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Mail/ContributionSummaryMail.php on line 12
+[18-Feb-2026 04:45:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Mail\Mailable" not found in /home/pvxkzubm/public_html/friends/app/Mail/PasswordReset.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Mail/PasswordReset.php on line 12

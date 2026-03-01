@@ -25,7 +25,7 @@
                 <th>Payment Type</th>
                 <th>Status</th>
                 <th>Payment Date</th>
-                <th>Transaction (Safaricom MPESA)</th> 
+                <th>Transaction (Safaricom MPESA)</th> {{-- NEW COLUMN --}}
             </tr>
         </thead>
         <tbody></tbody>

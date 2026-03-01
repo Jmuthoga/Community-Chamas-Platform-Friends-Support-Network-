@@ -1,0 +1,40 @@
+[14-Feb-2026 03:32:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\View\Component" not found in /home/pvxkzubm/public_html/friends/app/View/Components/CurrencySelector.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/View/Components/CurrencySelector.php on line 9
+[14-Feb-2026 10:40:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\View\Component" not found in /home/pvxkzubm/public_html/friends/app/View/Components/LoginModal.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/View/Components/LoginModal.php on line 9
+[14-Feb-2026 13:49:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\View\Component" not found in /home/pvxkzubm/public_html/friends/app/View/Components/DefaultModal.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/View/Components/DefaultModal.php on line 9
+[14-Feb-2026 13:49:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\View\Component" not found in /home/pvxkzubm/public_html/friends/app/View/Components/ProductTutorialModal.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/View/Components/ProductTutorialModal.php on line 9
+[14-Feb-2026 13:49:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\View\Component" not found in /home/pvxkzubm/public_html/friends/app/View/Components/SimpleAlert.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/View/Components/SimpleAlert.php on line 9
+[18-Feb-2026 03:33:49 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\View\Component" not found in /home/pvxkzubm/public_html/friends/app/View/Components/ProductTutorialModal.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/View/Components/ProductTutorialModal.php on line 9
+[18-Feb-2026 03:34:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\View\Component" not found in /home/pvxkzubm/public_html/friends/app/View/Components/CurrencySelector.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/View/Components/CurrencySelector.php on line 9
+[18-Feb-2026 04:21:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\View\Component" not found in /home/pvxkzubm/public_html/friends/app/View/Components/DefaultModal.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/View/Components/DefaultModal.php on line 9
+[18-Feb-2026 04:36:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\View\Component" not found in /home/pvxkzubm/public_html/friends/app/View/Components/LoginModal.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/View/Components/LoginModal.php on line 9
+[18-Feb-2026 05:22:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\View\Component" not found in /home/pvxkzubm/public_html/friends/app/View/Components/SimpleAlert.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/View/Components/SimpleAlert.php on line 9

@@ -109,6 +109,18 @@
         .customcheck-label {
             color: var(--fsn-blue);
         }
+        
+        .authentications {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .authentications .right-content {
+            width: 100%;
+            max-width: 750px;
+        }
     </style>
 </head>
 
@@ -117,11 +129,11 @@
 
     <!-- AUTHENTICATION-START (LOGIN) -->
     <section class="authentications">
-        <div class="left-content">
-            <figure>
-                <img src="{{ asset('assets/images/authentication/poss.png') }}" alt="register image">
-            </figure>
-        </div>
+        <!--<div class="left-content">-->
+        <!--    <figure>-->
+        <!--        <img src="{{ asset('assets/images/authentication/poss.png') }}" alt="register image">-->
+        <!--    </figure>-->
+        <!--</div>-->
         <div class="right-content">
             <form action="{{ route('signup') }}" method="post" class="authentication-form px-lg-5 needs-validation"
                 novalidate>

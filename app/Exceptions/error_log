@@ -1,0 +1,8 @@
+[13-Feb-2026 23:50:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Exceptions\Handler" not found in /home/pvxkzubm/public_html/friends/app/Exceptions/Handler.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Exceptions/Handler.php on line 8
+[18-Feb-2026 04:46:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Exceptions\Handler" not found in /home/pvxkzubm/public_html/friends/app/Exceptions/Handler.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Exceptions/Handler.php on line 8

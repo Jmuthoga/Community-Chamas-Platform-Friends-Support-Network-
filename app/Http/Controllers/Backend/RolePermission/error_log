@@ -1,0 +1,16 @@
+[14-Feb-2026 22:41:34 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/RolePermission/PermissionController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/RolePermission/PermissionController.php on line 10
+[15-Feb-2026 00:18:43 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/RolePermission/RoleController.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/RolePermission/RoleController.php on line 12
+[18-Feb-2026 05:41:15 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/RolePermission/RoleController.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/RolePermission/RoleController.php on line 12
+[18-Feb-2026 05:41:22 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/RolePermission/PermissionController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/pvxkzubm/public_html/friends/app/Http/Controllers/Backend/RolePermission/PermissionController.php on line 10
