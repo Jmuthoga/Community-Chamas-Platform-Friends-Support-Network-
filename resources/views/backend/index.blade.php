@@ -111,6 +111,36 @@ function percentage($value,$target){
         </div>
     </div>
 
+        <!-- Total Income -->
+    {{-- <div class="col-lg-3 col-6">
+        <div class="small-box bg-primary position-relative overflow-hidden">
+            <div class="inner">
+                <h3>{{ currency()->symbol ?? '' }} {{ number_format($totalIncome,2) }}</h3>
+                <p>Total Income</p>
+            </div>
+        </div>
+    </div> --}}
+
+        <!-- Total Expenses -->
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-danger position-relative overflow-hidden">
+            <div class="inner">
+                <h3>{{ currency()->symbol ?? '' }} {{ number_format($totalExpenses,2) }}</h3>
+                <p>Total Expenses</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Bank Balance -->
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-success position-relative overflow-hidden">
+            <div class="inner">
+                <h3>{{ currency()->symbol ?? '' }} {{ number_format($currentBankBalance,2) }}</h3>
+                <p>Current Bank Balance</p>
+            </div>
+        </div>
+    </div>
+
     <div class="col-lg-3 col-6">
         <div class="small-box bg-danger position-relative overflow-hidden">
             <div class="inner">

@@ -13,6 +13,7 @@ use App\Http\Controllers\Backend\CurrencyController;
 use App\Http\Controllers\Backend\WebsiteSettingController;
 use App\Http\Controllers\Backend\Member\ContributionController;
 use App\Http\Controllers\Backend\Member\MemberContributionPaymentController;
+use App\Http\Controllers\Backend\Treasurer\TreasurerController;
 
 
 /*
@@ -73,7 +74,16 @@ Route::prefix('admin')->as('backend.admin.')->middleware(['admin'])->group(funct
         Route::post('/payment/stk-callback', [MemberContributionPaymentController::class, 'handleStkCallback']);
         Route::post('/mpesa/stk-push', [MemberContributionPaymentController::class, 'stkPush'])->name('mpesa.stk.push')->middleware(['auth']);
         Route::get('check-payment-status/{checkoutId}',[MemberContributionPaymentController::class, 'checkPaymentStatus'])->name('mpesa.check.status');
-        
+
+        // ====================== TREASURE ======================
+        Route::prefix('treasurer')->as('treasurer.')->group(function () {
+            Route::get('dashboard', [TreasurerController::class, 'dashboard'])->name('dashboard');
+            Route::get('transactions', [TreasurerController::class, 'transactions'])->name('transactions');
+            Route::get('expenses', [TreasurerController::class, 'expenses'])->name('expenses');
+            Route::get('expenses/create', [TreasurerController::class, 'createExpense'])->name('expenses.create');
+            Route::post('expenses/store', [TreasurerController::class, 'storeExpense'])->name('expenses.store');
+            Route::get('reports', [TreasurerController::class, 'reports'])->name('reports');
+        });
         // ====================== CURRENCIES ======================
         Route::resource('currencies', CurrencyController::class);
         Route::get('currencies/default/{id}', [CurrencyController::class, 'setDefault'])->name('currencies.setDefault');

@@ -14,8 +14,7 @@ use App\Services\MpesaService;
 use App\Mail\ContributionNotificationMail;
 use App\Mail\ContributionSummaryMail;
 use Illuminate\Support\Facades\Mail;
-
-
+use App\Models\FinancialTransaction;
 class MemberContributionPaymentController extends Controller
 {
 
@@ -34,8 +33,8 @@ class MemberContributionPaymentController extends Controller
             return DataTables::of($payments)
                 ->addIndexColumn()
                 ->addColumn('month_year', function ($row) {
-                return optional($row->contribution)->month . ' / ' . optional($row->contribution)->year;
-            })
+                    return optional($row->contribution)->month . ' / ' . optional($row->contribution)->year;
+                })
                 ->addColumn('amount', fn($row) => number_format($row->amount, 2))
                 ->addColumn('contribution_id', fn($row) => $row->contribution_id)
                 ->addColumn('paid_at', function ($row) {
@@ -44,8 +43,8 @@ class MemberContributionPaymentController extends Controller
                         : '-';
                 })
                 ->addColumn('status', function ($row) {
-                return optional($row->contribution)->status === 'paid'
-                    ? '<span class="badge badge-success">Completed</span>'
+                    return optional($row->contribution)->status === 'paid'
+                        ? '<span class="badge badge-success">Completed</span>'
                         : '<span class="badge badge-warning">Installment</span>';
                 })
                 ->rawColumns(['status'])
@@ -157,7 +156,7 @@ class MemberContributionPaymentController extends Controller
         */
         if ($request->payment_method === 'cash') {
 
-            ContributionPayment::create([
+            $payment = ContributionPayment::create([
                 'user_id' => $user->id,
                 'contribution_id' => $contribution->id,
                 'amount' => $request->amount,
@@ -165,6 +164,8 @@ class MemberContributionPaymentController extends Controller
                 'paid_at' => now(),
                 'status' => 'completed'
             ]);
+
+            $this->syncToTreasurer($payment);
 
             $contribution->paid_amount += $request->amount;
 
@@ -178,9 +179,9 @@ class MemberContributionPaymentController extends Controller
             $monthYear = $contribution->month . ' / ' . $contribution->year;
             $totalAllTime = \App\Models\MonthlyContribution::sum('paid_amount');
             $totalPenalties = \App\Models\MonthlyContribution::where('month', now()->month)
-                                ->where('year', now()->year)
-                                ->sum('penalty');
-            
+                ->where('year', now()->year)
+                ->sum('penalty');
+
             $mailData = [
                 'user' => $user,
                 'name' => $user->name,
@@ -192,19 +193,19 @@ class MemberContributionPaymentController extends Controller
                 'totalAllTime' => $totalAllTime,
                 'totalPenalties' => $totalPenalties,
             ];
-                        
+
             // Merge live monthly stats
             $mailData = array_merge($mailData, $this->getMonthlyStats());
 
-            
+
             // Send notification
             Mail::to($user->email)->queue(new ContributionNotificationMail($mailData));
-            
+
             // Send summary if fully paid
             if ($this->isMonthFullyPaid()) {
-            
+
                 $users = \App\Models\User::pluck('email');
-            
+
                 foreach ($users as $email) {
                     Mail::to($email)->queue(new ContributionSummaryMail($mailData));
                 }
@@ -223,14 +224,14 @@ class MemberContributionPaymentController extends Controller
 
         // Determine phone
         $phone = $request->mpesa_phone ?: $user->phone;
-        
+
         // Normalize phone format
         $phone = preg_replace('/\D/', '', $phone);
-        
+
         if (substr($phone, 0, 1) == '0') {
             $phone = '254' . substr($phone, 1);
         }
-        
+
         if (substr($phone, 0, 3) == '254') {
             // Valid Kenyan format
         }
@@ -306,11 +307,11 @@ class MemberContributionPaymentController extends Controller
 
         // Normalize phone format
         $phone = preg_replace('/\D/', '', $request->phone);
-        
+
         if (substr($phone, 0, 1) == '0') {
             $phone = '254' . substr($phone, 1);
         }
-        
+
         if (substr($phone, 0, 3) == '254') {
             // Valid Kenyan format
         }
@@ -343,7 +344,7 @@ class MemberContributionPaymentController extends Controller
             'checkout_request_id' => $stkResponse['CheckoutRequestID']
         ]);
     }
-    
+
     // ================= MPESA STK CALLBACK =================
     public function handleStkCallback(Request $request)
     {
@@ -389,6 +390,8 @@ class MemberContributionPaymentController extends Controller
                 'paid_at' => now()
             ]);
 
+            $this->syncToTreasurer($payment);
+
             // Update contribution totals
             $contribution = MonthlyContribution::find($payment->contribution_id);
 
@@ -406,8 +409,8 @@ class MemberContributionPaymentController extends Controller
                 $monthYear = optional($contribution)->month . ' / ' . optional($contribution)->year;
                 $totalAllTime = \App\Models\MonthlyContribution::sum('paid_amount');
                 $totalPenalties = \App\Models\MonthlyContribution::where('month', now()->month)
-                                    ->where('year', now()->year)
-                                    ->sum('penalty');
+                    ->where('year', now()->year)
+                    ->sum('penalty');
 
                 $mailData = [
                     'user' => $user,
@@ -429,9 +432,9 @@ class MemberContributionPaymentController extends Controller
 
                 // Send summary if fully paid
                 if ($this->isMonthFullyPaid()) {
-                
+
                     $users = \App\Models\User::pluck('email');
-                
+
                     foreach ($users as $email) {
                         Mail::to($email)->queue(new ContributionSummaryMail($mailData));
                     }
@@ -443,8 +446,7 @@ class MemberContributionPaymentController extends Controller
         |--------------------------------------------------------------------------
         | FAILED / CANCELLED PAYMENT
         |--------------------------------------------------------------------------
-        */
-        else {
+        */ else {
             $payment->update([
                 'status' => 'failed'
             ]);
@@ -458,11 +460,11 @@ class MemberContributionPaymentController extends Controller
     public function checkPaymentStatus($checkoutId)
     {
         $payment = ContributionPayment::where('checkout_request_id', $checkoutId)->first();
-    
+
         if (!$payment) {
             return response()->json(['status' => 'not_found']);
         }
-    
+
         return response()->json([
             'status' => $payment->status,
             'receipt' => $payment->mpesa_receipt
@@ -499,33 +501,59 @@ class MemberContributionPaymentController extends Controller
 
         $totalMembers = \App\Models\User::count();
         $contributedCount = \App\Models\MonthlyContribution::where('month', $currentMonth)
-                            ->where('year', $currentYear)
-                            ->where('paid_amount', '>', 0)
-                            ->count();
+            ->where('year', $currentYear)
+            ->where('paid_amount', '>', 0)
+            ->count();
         $remainingCount = $totalMembers - $contributedCount;
         $totalCollected = \App\Models\MonthlyContribution::where('month', $currentMonth)
-                            ->where('year', $currentYear)
-                            ->sum('paid_amount');
+            ->where('year', $currentYear)
+            ->sum('paid_amount');
         $remainingBalance = \App\Models\MonthlyContribution::where('month', $currentMonth)
-                            ->where('year', $currentYear)
-                            ->sum(\DB::raw('total_amount - paid_amount'));
+            ->where('year', $currentYear)
+            ->sum(\DB::raw('total_amount - paid_amount'));
 
-        return compact('totalMembers','contributedCount','remainingCount','totalCollected','remainingBalance');
+        return compact('totalMembers', 'contributedCount', 'remainingCount', 'totalCollected', 'remainingBalance');
     }
-    
+
     private function isMonthFullyPaid()
     {
         $month = now()->month;
         $year = now()->year;
-    
+
         $totalMembers = \App\Models\User::count();
-    
+
         $fullyPaidMembers = \App\Models\MonthlyContribution::where('month', $month)
             ->where('year', $year)
             ->whereColumn('paid_amount', '>=', 'total_amount')
             ->count();
-    
+
         return $totalMembers === $fullyPaidMembers;
     }
 
+    private function syncToTreasurer(ContributionPayment $payment)
+    {
+        if ($payment->status !== 'completed') {
+            return;
+        }
+
+        $exists = FinancialTransaction::where('source_id', $payment->id)
+            ->where('source_type', ContributionPayment::class)
+            ->exists();
+
+        if ($exists) {
+            return;
+        }
+
+        FinancialTransaction::create([
+            'user_id' => $payment->user_id,
+            'reference' => $payment->mpesa_receipt ?? $payment->checkout_request_id ?? 'CASH-' . $payment->id,
+            'type' => 'contribution',
+            'amount' => $payment->amount,
+            'description' => 'Monthly Contribution Payment',
+            'payment_method' => $payment->phone ? 'mpesa' : 'cash',
+            'transaction_date' => $payment->paid_at ?? now(),
+            'source_id' => $payment->id,
+            'source_type' => ContributionPayment::class,
+        ]);
+    }
 }

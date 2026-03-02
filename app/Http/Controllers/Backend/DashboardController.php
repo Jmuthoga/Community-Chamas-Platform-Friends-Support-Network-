@@ -17,7 +17,7 @@ class DashboardController extends Controller
         $year  = now()->year;
 
         $monthlyQuery = MonthlyContribution::where('month', $month)
-                                           ->where('year', $year);
+            ->where('year', $year);
 
         $totalMembers = User::count();
         $monthlyCollected = $monthlyQuery->sum('paid_amount');
@@ -28,11 +28,16 @@ class DashboardController extends Controller
 
         $allTimeCollected = MonthlyContribution::sum('paid_amount');
         $allTimePenalties = MonthlyContribution::sum('penalty');
-        $totalPayments = ContributionPayment::where('status','completed')->count();
-        $fullyPaidMonths = MonthlyContribution::whereColumn('paid_amount','>=','total_amount')->count();
+        $totalPayments = ContributionPayment::where('status', 'completed')->count();
+        $fullyPaidMonths = MonthlyContribution::whereColumn('paid_amount', '>=', 'total_amount')->count();
 
         $monthlyTarget = 100000;
         $allTimeTarget = 5000000;
+
+        // --- ADD CURRENT BANK BALANCE, TOTAL INCOME, TOTAL EXPENSES ---
+        $totalIncome = \App\Models\FinancialTransaction::where('type', 'contribution')->sum('amount');
+        $totalExpenses = \App\Models\FinancialTransaction::where('type', 'expense')->sum('amount');
+        $currentBankBalance = $totalIncome - $totalExpenses; // net balance
 
         // Prepare data for monthly contributions chart (all 12 months)
         $months = [];
@@ -40,8 +45,8 @@ class DashboardController extends Controller
         for ($m = 1; $m <= 12; $m++) {
             $months[] = date('F', mktime(0, 0, 0, $m, 1));
             $monthlyCollectedPerMonth[] = MonthlyContribution::where('month', $m)
-                                                ->where('year', $year)
-                                                ->sum('paid_amount');
+                ->where('year', $year)
+                ->sum('paid_amount');
         }
 
         return view('backend.index', compact(
@@ -58,7 +63,9 @@ class DashboardController extends Controller
             'allTimeTarget',
             'totalMembers',
             'months',
-            'monthlyCollectedPerMonth'
+            'monthlyCollectedPerMonth',
+            'currentBankBalance',
+            'totalExpenses'     
         ));
     }
     public function profile()

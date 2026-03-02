@@ -87,7 +87,7 @@ $route = request()->route()->getName();
                         </a>
                     </li>
                     @endcan
-                    @can('view-contribution-view')
+                    {{-- @can('view-contribution-view')
                     <li class="nav-item">
                         <a href="{{ route('backend.admin.contributions.index') }}"
                         class="nav-link {{ $route === 'backend.admin.contributions.index' ? 'active' : '' }}">
@@ -95,7 +95,7 @@ $route = request()->route()->getName();
                             <p>All Contributions</p>
                         </a>
                     </li>
-                    @endcan
+                    @endcan --}}
 
                     @can('make-contribution-payment')
                     <li class="nav-item">
@@ -142,7 +142,7 @@ $route = request()->route()->getName();
             
                     @can('treasurer_dashboard')
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('backend.admin.treasurer.dashboard') }}" class="nav-link">
                             <i class="far fa-circle nav-icon"></i>
                             <p>Financial Overview</p>
                         </a>
@@ -151,7 +151,7 @@ $route = request()->route()->getName();
             
                     @can('treasurer_transactions')
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('backend.admin.treasurer.transactions') }}" class="nav-link">
                             <i class="far fa-circle nav-icon"></i>
                             <p>All Transactions</p>
                         </a>
@@ -160,7 +160,7 @@ $route = request()->route()->getName();
             
                     @can('treasurer_expenses')
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('backend.admin.treasurer.expenses') }}" class="nav-link">
                             <i class="far fa-circle nav-icon"></i>
                             <p>Expenses</p>
                         </a>
@@ -169,7 +169,7 @@ $route = request()->route()->getName();
             
                     @can('treasurer_reports')
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('backend.admin.treasurer.reports') }}" class="nav-link">
                             <i class="far fa-circle nav-icon"></i>
                             <p>Financial Reports</p>
                         </a>
@@ -354,29 +354,29 @@ $route = request()->route()->getName();
                 <ul class="nav nav-treeview">
             
                     {{-- General Summary --}}
-                    @can('report_summary')
+                    {{-- @can('report_summary')
                     <li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="fas fa-chart-pie nav-icon"></i>
                             <p>System Summary</p>
                         </a>
                     </li>
-                    @endcan
+                    @endcan --}}
             
                     {{-- Members Reports --}}
-                    @can('report_members')
+                    {{-- @can('report_members')
                     <li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="fas fa-users nav-icon"></i>
                             <p>Members Reports</p>
                         </a>
                     </li>
-                    @endcan
+                    @endcan --}}
             
                     {{-- Contribution Reports --}}
                     @can('report_contributions')
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('backend.admin.contributions.index') }}" class="nav-link">
                             <i class="fas fa-hand-holding-usd nav-icon"></i>
                             <p>Contribution Reports</p>
                         </a>
@@ -384,19 +384,19 @@ $route = request()->route()->getName();
                     @endcan
             
                     {{-- Contribution Payments --}}
-                    @can('report_contribution_payments')
+                    {{-- @can('report_contribution_payments')
                     <li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="fas fa-receipt nav-icon"></i>
                             <p>Contribution Payments</p>
                         </a>
                     </li>
-                    @endcan
+                    @endcan --}}
             
                     {{-- Financial Reports --}}
                     @can('report_financial')
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('backend.admin.treasurer.reports') }}" class="nav-link">
                             <i class="fas fa-wallet nav-icon"></i>
                             <p>Financial Reports</p>
                         </a>
@@ -404,24 +404,14 @@ $route = request()->route()->getName();
                     @endcan
             
                     {{-- Expenses Reports --}}
-                    @can('report_expenses')
+                    {{-- @can('report_expenses')
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('backend.admin.treasurer.reports') }}" class="nav-link">
                             <i class="fas fa-money-bill-wave nav-icon"></i>
                             <p>Expenses Reports</p>
                         </a>
                     </li>
-                    @endcan
-            
-                    {{-- Transactions Reports --}}
-                    @can('report_transactions')
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-exchange-alt nav-icon"></i>
-                            <p>Transactions Reports</p>
-                        </a>
-                    </li>
-                    @endcan
+                    @endcan --}}
             
                     {{-- Loans Reports --}}
                     @can('report_loans')
