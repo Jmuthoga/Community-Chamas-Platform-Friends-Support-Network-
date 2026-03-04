@@ -36,4 +36,9 @@ return [
         'redirect'      => env('GOOGLE_REDIRECT_URL'),
     ],
 
+    'sms' => [
+        'url' => env('SMS_API_URL'),
+        'key' => env('SMS_API_KEY'),
+    ],
+
 ];

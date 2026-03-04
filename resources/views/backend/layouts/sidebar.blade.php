@@ -188,7 +188,7 @@ $route = request()->route()->getName();
                 'event_create',
             ]))
             <li class="nav-header text-white">ANNOUNCEMENTS</li>
-            
+
             <li class="nav-item">
                 <a href="#" class="nav-link d-flex justify-content-between align-items-center">
                     <span>
@@ -197,45 +197,45 @@ $route = request()->route()->getName();
                     </span>
                     <i class="fas fa-angle-left right"></i>
                 </a>
-            
+
                 <ul class="nav nav-treeview">
-            
+
                     @can('announcement_view')
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('backend.admin.communications.announcements') }}" class="nav-link">
                             <i class="far fa-circle nav-icon"></i>
                             <p>All Announcements</p>
                         </a>
                     </li>
                     @endcan
-            
+
                     @can('announcement_create')
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('backend.admin.communications.announcements.create') }}" class="nav-link">
                             <i class="far fa-circle nav-icon"></i>
                             <p>Create Announcement</p>
                         </a>
                     </li>
                     @endcan
-            
+
                     @can('event_view')
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('backend.admin.communications.events') }}" class="nav-link">
                             <i class="far fa-calendar-alt nav-icon"></i>
                             <p>Events</p>
                         </a>
                     </li>
                     @endcan
-            
+
                     @can('event_create')
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('backend.admin.communications.events.create') }}" class="nav-link">
                             <i class="far fa-calendar-plus nav-icon"></i>
                             <p>Create Event</p>
                         </a>
                     </li>
                     @endcan
-            
+
                 </ul>
             </li>
             @endif

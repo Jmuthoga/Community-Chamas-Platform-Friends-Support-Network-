@@ -15,6 +15,9 @@ use App\Mail\ContributionNotificationMail;
 use App\Mail\ContributionSummaryMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\FinancialTransaction;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use App\Jobs\SendSmsJob;
 class MemberContributionPaymentController extends Controller
 {
 
@@ -194,6 +197,25 @@ class MemberContributionPaymentController extends Controller
                 'totalPenalties' => $totalPenalties,
             ];
 
+            // ------------------ SEND SMS ------------------
+            if ($user->phone) {
+                $smsMessage = "Dear {$user->name},\n\n"
+                    . "Your Contribution Payment has been received.\n"
+                    . "Month/Year: {$mailData['monthYear']}\n"
+                    . "Amount Paid: KES " . number_format($request->amount, 2) . "\n"
+                    . "Payment Type: {$request->payment_type}\n"
+                    . "Remaining Balance: KES " . number_format($contribution->total_amount - $contribution->paid_amount, 2) . "\n"
+                    . "Powered by JM Innovatech Solution\n"
+                    . "https://jminnovatechsolution.co.ke/";
+
+                SendSmsJob::dispatch($user->phone, $smsMessage);
+            }
+
+            // ------------------ SEND MONTHLY SUMMARY ------------------
+            if ($this->isMonthFullyPaid()) {
+                $this->sendMonthlySummary();
+            }
+
             // Merge live monthly stats
             $mailData = array_merge($mailData, $this->getMonthlyStats());
 
@@ -350,7 +372,7 @@ class MemberContributionPaymentController extends Controller
     {
         $payload = $request->all();
 
-        \Log::info('MPESA CALLBACK:', $payload);
+        Log::info('MPESA CALLBACK:', $payload);
 
         $callback = $payload['Body']['stkCallback'] ?? null;
 
@@ -423,6 +445,24 @@ class MemberContributionPaymentController extends Controller
                     'totalAllTime' => $totalAllTime,
                     'totalPenalties' => $totalPenalties
                 ];
+
+                // ------------------ SEND SMS ------------------
+                if ($user->phone) {
+                    $smsMessage = "Dear {$user->name},\n\n"
+                        . "Your Contribution Payment has been received.\n"
+                        . "Month/Year: {$mailData['monthYear']}\n"
+                        . "Amount Paid: KES " . number_format($payment->amount, 2) . "\n"
+                        . "Payment Type: {$payment->payment_type}\n"
+                        . "Remaining Balance: KES " . number_format($contribution->total_amount - $contribution->paid_amount, 2) . "\n"
+                        . "Powered by JM Innovatech Solution\n"
+                        . "https://jminnovatechsolution.co.ke/";
+
+                    SendSmsJob::dispatch($user->phone, $smsMessage);
+                }
+                // ------------------ SEND MONTHLY SUMMARY ------------------
+                if ($this->isMonthFullyPaid()) {
+                    $this->sendMonthlySummary();
+                }
 
                 // Merge live monthly stats
                 $mailData = array_merge($mailData, $this->getMonthlyStats());
@@ -510,7 +550,7 @@ class MemberContributionPaymentController extends Controller
             ->sum('paid_amount');
         $remainingBalance = \App\Models\MonthlyContribution::where('month', $currentMonth)
             ->where('year', $currentYear)
-            ->sum(\DB::raw('total_amount - paid_amount'));
+            ->sum(DB::raw('total_amount - paid_amount'));
 
         return compact('totalMembers', 'contributedCount', 'remainingCount', 'totalCollected', 'remainingBalance');
     }
@@ -555,5 +595,28 @@ class MemberContributionPaymentController extends Controller
             'source_id' => $payment->id,
             'source_type' => ContributionPayment::class,
         ]);
+    }
+
+    private function sendMonthlySummary()
+    {
+        $mailData = $this->getMonthlyStats();
+        $users = \App\Models\User::whereNotNull('phone')->get();
+
+        foreach ($users as $u) {
+            $smsSummary = "Dear Members,\n\n"
+                . "Monthly Contribution Summary\n\n"
+                . "Month/Year: {$mailData['monthYear']}\n"
+                . "Total Collected: KES " . number_format($mailData['totalCollected'], 2) . "\n"
+                . "Remaining Balance: KES " . number_format($mailData['remainingBalance'], 2) . "\n"
+                . "Powered by JM Innovatech Solution\n"
+                . "https://jminnovatechsolution.co.ke/";
+
+            SendSmsJob::dispatch($u->phone, $smsSummary);
+        }
+
+        $emails = \App\Models\User::pluck('email');
+        foreach ($emails as $email) {
+            Mail::to($email)->queue(new ContributionSummaryMail($mailData));
+        }
     }
 }

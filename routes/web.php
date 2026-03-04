@@ -14,7 +14,7 @@ use App\Http\Controllers\Backend\WebsiteSettingController;
 use App\Http\Controllers\Backend\Member\ContributionController;
 use App\Http\Controllers\Backend\Member\MemberContributionPaymentController;
 use App\Http\Controllers\Backend\Treasurer\TreasurerController;
-
+use App\Http\Controllers\Backend\Communication\AnnouncementEventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -84,6 +84,26 @@ Route::prefix('admin')->as('backend.admin.')->middleware(['admin'])->group(funct
             Route::post('expenses/store', [TreasurerController::class, 'storeExpense'])->name('expenses.store');
             Route::get('reports', [TreasurerController::class, 'reports'])->name('reports');
         });
+
+        // ====================== ANNOUNCEMENTS & EVENTS ======================
+        Route::prefix('communications')->as('communications.')->group(function () {
+            Route::get('announcements', [AnnouncementEventController::class, 'announcements'])->name('announcements');
+            Route::get('announcements/create', [AnnouncementEventController::class, 'createAnnouncement'])->name('announcements.create');
+            Route::post('announcements/store', [AnnouncementEventController::class, 'storeAnnouncement'])->name('announcements.store');
+
+            Route::get('announcements/edit/{announcement}', [AnnouncementEventController::class, 'editAnnouncement'])->name('announcements.edit');
+            Route::put('announcements/update/{announcement}', [AnnouncementEventController::class, 'updateAnnouncement'])->name('announcements.update');
+            Route::delete('announcements/delete/{announcement}', [AnnouncementEventController::class, 'deleteAnnouncement'])->name('announcements.delete');
+            
+            Route::get('events', [AnnouncementEventController::class, 'events'])->name('events');
+            Route::get('events/create', [AnnouncementEventController::class, 'createEvent'])->name('events.create');
+            Route::post('events/store', [AnnouncementEventController::class, 'storeEvent'])->name('events.store');
+
+            Route::get('events/edit/{event}', [AnnouncementEventController::class, 'editEvent'])->name('events.edit');
+            Route::put('events/update/{event}', [AnnouncementEventController::class, 'updateEvent'])->name('events.update');
+            Route::delete('events/delete/{event}', [AnnouncementEventController::class, 'deleteEvent'])->name('events.delete');
+        });
+
         // ====================== CURRENCIES ======================
         Route::resource('currencies', CurrencyController::class);
         Route::get('currencies/default/{id}', [CurrencyController::class, 'setDefault'])->name('currencies.setDefault');

@@ -1,19 +1,27 @@
 @component('mail::message')
-# Hello {{ $mailData['name'] }},
+# Hello {{ $mailData['name'] ?? 'Member' }},
 
-You have just made your contribution for {{ $mailData['monthYear'] }}.
+Thank you for your contribution for **{{ $mailData['monthYear'] ?? 'this month' }}**.  
 
-**Current Summary:**
-- Total Members: {{ $mailData['totalMembers'] }}
-- Members Contributed: {{ $mailData['contributedCount'] }}
-- Members Remaining: {{ $mailData['remainingCount'] }}
-- Total Collected This Month: KES {{ number_format($mailData['totalCollected'], 2) }}
-- Remaining Balance: KES {{ number_format($mailData['remainingBalance'], 2) }}
+Here’s a summary of the current status:
 
-@component('mail::button', ['url' => $mailData['dashboardUrl']])
+**Contribution Summary:**  
+- **Total Members:** {{ $mailData['totalMembers'] ?? 0 }}  
+- **Members Contributed:** {{ $mailData['contributedCount'] ?? 0 }}  
+- **Members Remaining:** {{ $mailData['remainingCount'] ?? 0 }}  
+- **Total Collected This Month:** KES {{ number_format($mailData['totalCollected'] ?? 0, 2) }}  
+- **Remaining Balance:** KES {{ number_format($mailData['remainingBalance'] ?? 0, 2) }}
+
+@component('mail::button', ['url' => $mailData['dashboardUrl'] ?? url('/')])
 View Contributions
 @endcomponent
 
-Thanks,<br>
-{{ env('WEBSITE_NAME') }}
+We appreciate your continued support and commitment to our community.  
+
+Best regards,<br>
+**{{ env('WEBSITE_NAME') ?? 'Our Team' }}**
+
+---
+
+<sub>This software is powered by <a href="https://jminnovatechsolution.co.ke/" target="_blank">JM Innovatech Solution</a>.</sub>
 @endcomponent
