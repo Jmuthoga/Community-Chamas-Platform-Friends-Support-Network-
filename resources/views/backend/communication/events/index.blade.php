@@ -17,35 +17,41 @@
     </div>
 
     <div class="card-body">
-        <table class="table table-bordered" id="events-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Location</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Email</th>
-                    <th>SMS</th>
-                    <th>Status</th>
-                    <th>Creator</th>
-                    <th>Created At</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-        </table>
+        <!-- Add table-responsive wrapper -->
+        <div class="table-responsive">
+            <table class="table table-bordered" id="events-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Location</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Email</th>
+                        <th>SMS</th>
+                        <th>Status</th>
+                        <th>Creator</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
     </div>
 </div>
 
 @push('script')
 <script>
 $(function() {
-    $('#events-table').DataTable({
+    let table = $('#events-table').DataTable({
         processing: true,
         serverSide: true,
         ajax: '{{ route("backend.admin.communications.events") }}',
-        order: [[10, 'desc']],
+        order: [[10, 'desc']], // created_at column
+        scrollX: true,         // horizontal scroll
+        scrollCollapse: true,  // shrink table if few rows
+        fixedHeader: true,     // keeps search & length fixed
         columns: [
             { data: 'DT_RowIndex', orderable: false, searchable: false },
             { data: 'title' },
@@ -62,6 +68,7 @@ $(function() {
         ]
     });
 
+    // Delete button
     $(document).on('click', '.btn-delete', function() {
         let id = $(this).data('id');
         if(confirm('Are you sure you want to delete this event?')) {
@@ -71,7 +78,7 @@ $(function() {
                 data: { _token: '{{ csrf_token() }}' },
                 success: function(res) {
                     alert(res.success);
-                    $('#events-table').DataTable().ajax.reload();
+                    table.ajax.reload();
                 }
             });
         }
